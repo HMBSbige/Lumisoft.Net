@@ -169,6 +169,28 @@ namespace LumiSoft.Net.Mail
         #endregion
 
 
+        #region method Clone
+
+        /// <summary>
+        /// Clones mail message.
+        /// </summary>
+        /// <returns>Returns cloned message.</returns>
+        /// <exception cref="ObjectDisposedException">Is raised when this object is disposed and this method is accessed.</exception>
+        public Mail_Message Clone()
+        {
+            if(this.IsDisposed){
+                throw new ObjectDisposedException(this.GetType().Name);
+            }
+
+            MemoryStreamEx ms = new MemoryStreamEx(64000);
+            this.ToStream(ms,null,null);
+            ms.Position = 0;
+            
+            return Mail_Message.ParseFromStream(ms);
+        }
+
+        #endregion
+
         #region method GetAttachments
 
         /// <summary>
