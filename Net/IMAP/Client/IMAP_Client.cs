@@ -1346,11 +1346,11 @@ namespace LumiSoft.Net.IMAP.Client
                     m_pImapClient.TcpStream.EndWrite(ar);
 
                     // Read IMAP server response.
-                    SmartStream.ReadLineAsyncOP op = new SmartStream.ReadLineAsyncOP(new byte[8000],SizeExceededAction.JunkAndThrowException);
-                    op.Completed += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
+                    ReadFinalResponseAsyncOP op = new ReadFinalResponseAsyncOP(null);
+                    op.CompletedAsync += delegate(object s,EventArgs<ReadFinalResponseAsyncOP> e){
                         AuthenticateReadResponseCompleted(op);
                     };
-                    if(m_pImapClient.TcpStream.ReadLine(op,true)){
+                    if(!m_pImapClient.ReadFinalResponseAsync(op)){
                         AuthenticateReadResponseCompleted(op);
                     }
                 }
@@ -1369,16 +1369,13 @@ namespace LumiSoft.Net.IMAP.Client
             /// Is called when IMAP server response reading has completed.
             /// </summary>
             /// <param name="op">Asynchronous operation.</param>
-            private void AuthenticateReadResponseCompleted(SmartStream.ReadLineAsyncOP op)
+            private void AuthenticateReadResponseCompleted(ReadFinalResponseAsyncOP op)
             {
                 try{
-                    // Log
-                    m_pImapClient.LogAddRead(op.BytesInBuffer,op.LineUtf8);
-
                     // Continue authenticating.
-                    if(op.LineUtf8.StartsWith("+")){
+                    if(op.FinalResponse.IsContinue){
                         // + base64Data, we need to decode it.
-                        byte[] serverResponse = Convert.FromBase64String(op.LineUtf8.Split(new char[]{' '},2)[1]);
+                        byte[] serverResponse = Convert.FromBase64String(op.FinalResponse.ResponseText);
 
                         byte[] clientResponse = m_pSASL.Continue(serverResponse);
 
@@ -1392,14 +1389,14 @@ namespace LumiSoft.Net.IMAP.Client
                         m_pImapClient.TcpStream.BeginWrite(buffer,0,buffer.Length,this.AuthenticateCommandSendingCompleted,null);
                     }
                     // Authentication suceeded.
-                    else if(string.Equals(op.LineUtf8.Split(new char[]{' '},3)[1],"OK",StringComparison.InvariantCultureIgnoreCase)){
+                    else if(!op.FinalResponse.IsError){
                         m_pImapClient.m_pAuthenticatedUser = new GenericIdentity(m_pSASL.UserName,m_pSASL.Name);
 
                         SetState(AsyncOP_State.Completed);
                     }
                     // Authentication rejected.
                     else{
-                        m_pException = new IMAP_ClientException(op.LineUtf8);
+                        m_pException = new IMAP_ClientException(op.FinalResponse);
                         SetState(AsyncOP_State.Completed);
                     }
                 }
