@@ -81,6 +81,7 @@
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms">
       <Name>System.Windows.Forms</Name>
     </Reference>
@@ -109,6 +110,7 @@
     <Compile Include="AsyncOP.cs" />
     <None Include="Media\Codec\Audio\ILBC.cs" />
     <Compile Include="AsyncOP_State.cs" />
+    <Compile Include="AUTH\AUTH_Gmail_OAuth1_3leg.cs" />
     <Compile Include="AUTH\AUTH_SASL_Client.cs" />
     <Compile Include="AUTH\AUTH_SASL_Client_CramMd5.cs" />
     <Compile Include="AUTH\AUTH_SASL_Client_DigestMd5.cs" />
