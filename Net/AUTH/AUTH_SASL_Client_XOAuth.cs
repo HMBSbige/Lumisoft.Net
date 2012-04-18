@@ -9,34 +9,35 @@ namespace LumiSoft.Net.AUTH
     /// </summary>
     public class AUTH_SASL_Client_XOAuth : AUTH_SASL_Client
     {
-        private bool                              m_IsCompleted           = false;
-        private int                               m_State                 = 0;
-        private string                            m_UserName              = null;
-        private string                            m_RequestUri            = null;
-        private KeyValueCollection<string,string> m_pRequestUriParameters = null;
+        private bool   m_IsCompleted = false;
+        private int    m_State       = 0;
+        private string m_UserName    = null;
+        private string m_AuthString  = null;       
 
         /// <summary>
         /// Default constructor.
         /// </summary>
         /// <param name="userName">User login name.</param>
-        /// <param name="requestUri">OAuth request URI.</param>
-        /// <param name="requestUriParameters">OAuth request URI parameters.</param>
-        /// <exception cref="ArgumentNullException">Is raised when <b>userName</b>,<b>requestUri</b> or <b>requestUriParameters</b> is null reference.</exception>
-        public AUTH_SASL_Client_XOAuth(string userName,string requestUri,KeyValueCollection<string,string> requestUriParameters)
+        /// <param name="authString">OAUTH authentication string. For example you can use <see cref="AUTH_Gmail_OAuth1_3leg.GetXOAuthStringForImap()"/> to get valid string.</param>
+        /// <exception cref="ArgumentNullException">Is raised when <b>userName</b> or <b>authString</b> is null reference.</exception>
+        /// <exception cref="ArgumentException">Is riased when any of the arguments has invalid value.</exception>
+        public AUTH_SASL_Client_XOAuth(string userName,string authString)
         {
             if(userName == null){
                 throw new ArgumentNullException("userName");
             }
-            if(requestUri == null){
-                throw new ArgumentNullException("requestUri");
+            if(userName == ""){
+                throw new ArgumentException("Argument 'userName' value must be specified.","userName");
             }
-            if(requestUriParameters == null){
-                throw new ArgumentNullException("requestUriParameters");
+            if(authString == null){
+                throw new ArgumentNullException("authString");
+            }
+            if(authString == ""){
+                throw new ArgumentException("Argument 'authString' value must be specified.","authString");
             }
 
-            m_UserName              = userName;
-            m_RequestUri            = requestUri;
-            m_pRequestUriParameters = requestUriParameters;
+            m_UserName   = userName;
+            m_AuthString = authString;
         }
 
 
@@ -58,65 +59,10 @@ namespace LumiSoft.Net.AUTH
             if(m_State == 0){
                 m_IsCompleted = true;
 
-                StringBuilder retVal = new StringBuilder();
-                retVal.Append("GET " + m_RequestUri + " ");
-                bool first = true;
-                foreach(KeyValuePair<string,string> p in m_pRequestUriParameters){
-                    if(first){
-                        first = false;
-
-                        retVal.Append(EncodeParamter(p.Key) + "=\"" + EncodeParamter(p.Value) + "\"");
-                    }
-                    else{
-                        retVal.Append("," + EncodeParamter(p.Key) + "=\"" + EncodeParamter(p.Value) + "\"");
-                    }
-                }
-
-                return Encoding.ASCII.GetBytes(retVal.ToString());
+                return Encoding.UTF8.GetBytes(m_AuthString);
             }
 
             return null;
-        }
-
-        #endregion
-
-
-        #region method EncodeParamter
-
-        /// <summary>
-        /// Encodes paramter name or value.
-        /// </summary>
-        /// <param name="value">Parameter name or value.</param>
-        /// <returns>Returns encoded value.</returns>
-        /// <exception cref="ArgumentNullException">Is raised when <b>value</b> is null reference value.</exception>
-        private string EncodeParamter(string value)
-        {
-            if(value == null){
-                throw new ArgumentNullException("value");
-            }
-
-            /* All parameter names and values are escaped using the [RFC3986] percent-encoding (%xx) mechanism. 
-               Characters not in the unreserved character set ([RFC3986] section 2.3) MUST be encoded. 
-               Characters in the unreserved character set MUST NOT be encoded. Hexadecimal characters in encodings MUST be upper case. 
-               Text names and values MUST be encoded as UTF-8 octets before percent-encoding them per [RFC3629]. 
-               unreserved = ALPHA, DIGIT, '-', '.', '_', '~'
-            */
-
-            byte[] valueUtf8 = Encoding.UTF8.GetBytes(value);
-
-            StringBuilder retVal = new StringBuilder();
-            foreach(byte b in valueUtf8){
-                // unreserverd
-                if((b >= 65 && b <= 90) || (b >= 97 && b <= 122)|| (b >= 48 && b <= 57) || b == '-' || b == '.' || b == '_' || b == '~'){
-                    retVal.Append((char)b);
-                }
-                // Encoding needed.
-                else{
-                    retVal.Append(b.ToString("X2"));
-                }
-            }
-
-            return retVal.ToString();
         }
 
         #endregion
