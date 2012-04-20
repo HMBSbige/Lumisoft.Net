@@ -233,6 +233,71 @@ namespace LumiSoft.Net.AUTH
 
         #endregion
 
+        #region method GetXOAuthStringForSmtp
+
+        /// <summary>
+        /// Gets Gmail XOAUTH authentication string.
+        /// </summary>
+        /// <returns>Returns Gmail XOAUTH authentication string.</returns>
+        /// <exception cref="InvalidOperationException">Is raised when this method is called in invalid state.</exception>
+        public string GetXOAuthStringForSmtp()
+        {
+            return GetXOAuthStringForSmtp(m_Email == null ? GetUserEmail() : m_Email);
+        }
+
+        /// <summary>
+        /// Gets Gmail XOAUTH authentication string.
+        /// </summary>
+        /// <param name="email">Gmail email address.</param>
+        /// <returns>Returns Gmail XOAUTH authentication string.</returns>
+        /// <exception cref="ArgumentNullException">Is raised when <b>email</b> is null reference.</exception>
+        /// <exception cref="ArgumentException">Is raised when any of the arguments has invalid value.</exception>
+        /// <exception cref="InvalidOperationException">Is raised when this method is called in invalid state.</exception>
+        public string GetXOAuthStringForSmtp(string email)
+        {
+            if(email == null){
+                throw new ArgumentNullException("email");
+            }
+            if(email == ""){
+                throw new ArgumentException("Argument 'email' value must be specified.","email");
+            }
+            if(string.IsNullOrEmpty(m_AccessToken)){
+                throw new InvalidOperationException("Invalid state, you need to call 'GetAccessToken' method first.");
+            }
+
+            string url       = "https://mail.google.com/mail/b/" + email + "/smtp/";
+            string timestamp = GenerateTimeStamp();
+            string nonce     = GenerateNonce();
+
+            // Build signature base.
+            StringBuilder xxx = new StringBuilder();
+            xxx.Append("oauth_consumer_key=" + UrlEncode(m_ConsumerKey));
+            xxx.Append("&oauth_nonce=" + UrlEncode(nonce));
+            xxx.Append("&oauth_signature_method=" + UrlEncode("HMAC-SHA1"));
+            xxx.Append("&oauth_timestamp=" + UrlEncode(timestamp));
+            xxx.Append("&oauth_token=" + UrlEncode(m_AccessToken));
+            xxx.Append("&oauth_version=" + UrlEncode("1.0"));
+            string signatureBase = "GET" + "&" + UrlEncode(url) + "&" +  UrlEncode(xxx.ToString());
+
+            // Calculate signature.
+            string signature = ComputeHmacSha1Signature(signatureBase,m_ConsumerSecret,m_AccessTokenSecret);
+
+            StringBuilder retVal = new StringBuilder();
+            retVal.Append("GET ");
+            retVal.Append(url);
+            retVal.Append(" oauth_consumer_key=\"" + UrlEncode(m_ConsumerKey) + "\"");
+            retVal.Append(",oauth_nonce=\"" + UrlEncode(nonce) + "\"");
+            retVal.Append(",oauth_signature=\"" + UrlEncode(signature) + "\"");
+            retVal.Append(",oauth_signature_method=\"" + "HMAC-SHA1\"");
+            retVal.Append(",oauth_timestamp=\"" + UrlEncode(timestamp) + "\"");
+            retVal.Append(",oauth_token=\"" + UrlEncode(m_AccessToken) + "\"");
+            retVal.Append(",oauth_version=\"" + "1.0\"");
+
+            return retVal.ToString();
+        }
+
+        #endregion
+
         #region method GetXOAuthStringForImap
 
         /// <summary>
