@@ -148,7 +148,7 @@ namespace LumiSoft.Net.MIME
         /// <summary>
         /// Creates attachment entity.
         /// </summary>
-        /// <param name="stream">Attachment data stream.</param>
+        /// <param name="stream">Attachment data stream. Data is read from stream current position.</param>
         /// <param name="fileName">File name.</param>
         /// <returns>Returns created attachment entity.</returns>
         /// <exception cref="ArgumentNullException">Is raised when <b>stream</b> or <b>fileName</b> is null reference.</exception>
@@ -161,6 +161,8 @@ namespace LumiSoft.Net.MIME
                 throw new ArgumentNullException("fileName");
             }
 
+            long fileSize = stream.CanSeek ? (stream.Length - stream.Position) : -1;
+
             MIME_Entity retVal = new MIME_Entity();
             MIME_b_Application body = new MIME_b_Application(MIME_MediaTypes.Application.octet_stream);
             retVal.Body = body;
@@ -169,7 +171,7 @@ namespace LumiSoft.Net.MIME
 
             MIME_h_ContentDisposition disposition = new MIME_h_ContentDisposition(MIME_DispositionTypes.Attachment);
             disposition.Param_FileName         = Path.GetFileName(fileName);
-            disposition.Param_Size             = stream.CanSeek ? (stream.Length - stream.Position) : -1;
+            disposition.Param_Size             = fileSize;
             //disposition.Param_CreationDate     = fileInfo.CreationTime;
             //disposition.Param_ModificationDate = fileInfo.LastWriteTime;
             //disposition.Param_ReadDate         = fileInfo.LastAccessTime;
