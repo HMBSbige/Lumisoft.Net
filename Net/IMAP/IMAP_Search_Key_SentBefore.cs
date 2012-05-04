@@ -70,7 +70,7 @@ namespace LumiSoft.Net.IMAP
         /// <returns>Returns this as string.</returns>
         public override string ToString()
         {
-            return "SENTBEFORE " + m_Date.ToString("dd-MMM-yyyy");
+            return "SENTBEFORE " + m_Date.ToString("dd-MMM-yyyy",System.Globalization.CultureInfo.InvariantCulture);
         }
 
         #endregion

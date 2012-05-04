@@ -69,7 +69,7 @@ namespace LumiSoft.Net.IMAP
         /// <returns>Returns this as string.</returns>
         public override string ToString()
         {
-            return "BEFORE " + m_Date.ToString("dd-MMM-yyyy");
+            return "BEFORE " + m_Date.ToString("dd-MMM-yyyy",System.Globalization.CultureInfo.InvariantCulture);
         }
 
         #endregion
