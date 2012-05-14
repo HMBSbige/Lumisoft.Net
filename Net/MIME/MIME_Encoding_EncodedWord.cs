@@ -14,7 +14,8 @@ namespace LumiSoft.Net.MIME
         private Encoding                 m_pCharset = null;
         private bool                     m_Split    = true;
 
-        private static readonly Regex encodedword_regex = new Regex(@"=\?(((?<charset>.*?)\*.*?)|(?<charset>.*?))\?(?<encoding>[qQbB])\?(?<value>.*?)\?=(?<whitespaces>\s*)",RegexOptions.IgnoreCase);
+        //private static readonly Regex encodedword_regex = new Regex(@"=\?(((?<charset>.*?)\*.*?)|(?<charset>.*?))\?(?<encoding>[qQbB])\?(?<value>.*?)\?=(?<whitespaces>\s*)",RegexOptions.IgnoreCase);
+        private static readonly Regex encodedword_regex = new Regex(@"\=\?(?<charset>\S+?)\?(?<encoding>[qQbB])\?(?<value>.+?)\?\=(?<whitespaces>\s*)",RegexOptions.IgnoreCase);
 
         /// <summary>
         /// Default constructor.
@@ -253,7 +254,7 @@ namespace LumiSoft.Net.MIME
             retVal = encodedword_regex.Replace(retVal,delegate(Match m){
                 // We have encoded word, try to decode it.
                 // Also if we have continuing encoded word, we need to skip all whitespaces between words.
-              
+             
                 string encodedWord = m.Value;
                 try{
                     if(string.Equals(m.Groups["encoding"].Value,"Q",StringComparison.InvariantCultureIgnoreCase)){
