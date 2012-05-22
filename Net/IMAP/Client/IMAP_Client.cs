@@ -6801,7 +6801,7 @@ namespace LumiSoft.Net.IMAP.Client
                 if(m_pCharset != null){
                     currentCmdLine.Append(" CHARSET " + m_pCharset.WebName.ToUpper());
                 }
-                currentCmdLine.Append(" (");
+                currentCmdLine.Append(" ");
                 //--- Build search items --------------------------------------------
                 List<IMAP_Client_CmdPart> cmdParts = new List<IMAP_Client_CmdPart>();
                 m_pCriteria.ToCmdParts(cmdParts);
@@ -6834,7 +6834,7 @@ namespace LumiSoft.Net.IMAP.Client
                     }
                 }
                 //--------------------------------------------------------------------
-                currentCmdLine.Append(")\r\n");
+                currentCmdLine.Append("\r\n");
 
                 // Set command lines and their log lines.
                 List<string> logLines = new List<string>();
