@@ -171,7 +171,7 @@ namespace LumiSoft.Net.AUTH
             lock(m_pNonces){
                 for(int i=0;i<m_pNonces.Count;i++){
                     // Nonce expired, remove it.
-                    if(m_pNonces[i].CreateTime.AddSeconds(m_ExpireTime) > DateTime.Now){
+                    if(m_pNonces[i].CreateTime.AddSeconds(m_ExpireTime) < DateTime.Now){
                         m_pNonces.RemoveAt(i);
                         i--;
                     }
