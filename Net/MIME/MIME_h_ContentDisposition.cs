@@ -93,11 +93,11 @@ namespace LumiSoft.Net.MIME
             }
 
             // We should not have encoded words here, but some email clients do this, so encoded them if any.
-            value = MIME_Encoding_EncodedWord.DecodeS(value);
+            string valueDecoded = MIME_Encoding_EncodedWord.DecodeS(value);
 
             MIME_h_ContentDisposition retVal = new MIME_h_ContentDisposition();
             
-            string[] name_value = value.Split(new char[]{':'},2);
+            string[] name_value = valueDecoded.Split(new char[]{':'},2);
             if(name_value.Length != 2){
                 throw new ParseException("Invalid Content-Type: header field value '" + value + "'.");
             }
