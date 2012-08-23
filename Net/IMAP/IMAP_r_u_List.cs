@@ -114,7 +114,7 @@ namespace LumiSoft.Net.IMAP
 
             string attributes = r.ReadParenthesized();
             string delimiter  = r.ReadWord();
-            string folder     = TextUtils.UnQuoteString(IMAP_Utils.DecodeMailbox(r.ReadToEnd().Trim()));
+            string folder     = IMAP_Utils.DecodeMailbox(r.ReadToEnd().Trim());
 
             return new IMAP_r_u_List(folder,delimiter[0],attributes == string.Empty ? new string[0] : attributes.Split(' '));
         }
