@@ -371,7 +371,7 @@ namespace LumiSoft.Net.IMAP
                 non-NIL, this is a start of group marker, and the mailbox name
                 field holds the group name phrase.
             */
-            
+        
             r.ReadToFirstChar();
             if(r.StartsWith("NIL",false)){
                 r.ReadWord();
@@ -380,29 +380,30 @@ namespace LumiSoft.Net.IMAP
             }
             else{
                 List<Mail_t_Address> retVal = new List<Mail_t_Address>();
-                // Eat addresses starting "(".
-                r.ReadSpecifiedLength(1);
+                
+                StringReader addressesReader = new StringReader(r.ReadParenthesized());
+                addressesReader.ReadToFirstChar();
 
-                while(r.Available > 0){
-                    // We have addresses ending ")".
-                    if(r.StartsWith(")")){
-                        r.ReadSpecifiedLength(1);
-                        break;
+                while(addressesReader.Available > 0){
+                    // Eat address starting "(".
+                    if(addressesReader.StartsWith("(")){
+                        addressesReader.ReadSpecifiedLength(1);
                     }
 
-                    // Eat address starting "(".
-                    r.ReadSpecifiedLength(1);
-
-                    string personalName = ReadAndDecodeWord(r);
-                    string atDomainList = r.ReadWord();
-                    string mailboxName  = r.ReadWord();
-                    string hostName     = r.ReadWord();
+                    string personalName = ReadAndDecodeWord(addressesReader);
+                    string atDomainList = addressesReader.ReadWord();
+                    string mailboxName  = addressesReader.ReadWord();
+                    string hostName     = addressesReader.ReadWord();
 
                     retVal.Add(new Mail_t_Mailbox(personalName,mailboxName + "@" + hostName));
 
                     // Eat address ending ")".
-                    r.ReadSpecifiedLength(1);
-                }
+                    if(addressesReader.EndsWith(")")){
+                        addressesReader.ReadSpecifiedLength(1);
+                    }
+
+                    addressesReader.ReadToFirstChar();
+                }               
 
                 return retVal.ToArray();
             }
