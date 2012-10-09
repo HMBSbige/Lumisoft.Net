@@ -529,11 +529,15 @@ namespace LumiSoft.Net.SIP.Stack
                                     m_pLocalPublicEP = publicEP;
                                 }
 
-                                completionWaiter.Set();
+                                if(completionWaiter != null){
+                                    completionWaiter.Set();
+                                }
                             });
                             optionsTransaction.StateChanged += new EventHandler(delegate(object s,EventArgs e){
-                                if(optionsTransaction.State == SIP_TransactionState.Terminated){                 
-                                    completionWaiter.Set();
+                                if(optionsTransaction.State == SIP_TransactionState.Terminated){
+                                    if(completionWaiter != null){
+                                        completionWaiter.Set();
+                                    }
                                 }
                             });
                             optionsTransaction.Start();
@@ -541,6 +545,7 @@ namespace LumiSoft.Net.SIP.Stack
                             // Wait OPTIONS request to complete.
                             completionWaiter.WaitOne();
                             completionWaiter.Close();
+                            completionWaiter = null;
                         }
                         catch{
                         }
