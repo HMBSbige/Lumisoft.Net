@@ -29,8 +29,16 @@ namespace LumiSoft.Net.TCP
             /// </summary>
             /// <param name="socket">Listening socket.</param>
             /// <param name="bind">Bind info what acceped socket.</param>
+            /// <exception cref="ArgumentNullException">Is raised when <b>socket</b> or <b>bind</b> is null reference.</exception>
             public ListeningPoint(Socket socket,IPBindInfo bind)
             {
+                if(socket == null){
+                    throw new ArgumentNullException("socket");
+                }
+                if(bind == null){
+                    throw new ArgumentNullException("socket");
+                }
+
                 m_pSocket   = socket;
                 m_pBindInfo = bind;
             }
@@ -447,6 +455,17 @@ namespace LumiSoft.Net.TCP
                 return;
             }
             m_IsRunning = false;
+
+            // Dispose all old TCP acceptors.
+            foreach(TCP_Acceptor acceptor in m_pConnectionAcceptors.ToArray()){
+                try{
+                    acceptor.Dispose();
+                }
+                catch(Exception x){
+                    OnError(x);
+                }
+            }
+            m_pConnectionAcceptors.Clear();
 
             // Dispose all old binds.
             foreach(ListeningPoint listeningPoint in m_pListeningPoints.ToArray()){
