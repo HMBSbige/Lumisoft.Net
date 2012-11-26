@@ -31,6 +31,10 @@ namespace LumiSoft.Net.IMAP
             // Keys group
             if(r.StartsWith("(",false)){
                 return IMAP_Search_Key_Group.Parse(new StringReader(r.ReadParenthesized()));
+            }                
+            // ALL
+            else if(r.StartsWith("ALL",false)){
+                return IMAP_Search_Key_All.Parse(r);
             }
             // ANSWERED
             else if(r.StartsWith("ANSWERED",false)){
