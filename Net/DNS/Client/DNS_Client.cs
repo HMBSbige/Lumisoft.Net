@@ -289,20 +289,27 @@ namespace LumiSoft.Net.DNS.Client
 
             DNS_ClientTransaction transaction = CreateTransaction(queryType,queryText,timeout);            
             transaction.Timeout += delegate(object s,EventArgs e){
-                wait.Set();
+                if(wait != null){
+                    wait.Set();
+                    wait.Close();
+                    wait = null;
+                }
             };
             transaction.StateChanged += delegate(object s1,EventArgs<DNS_ClientTransaction> e1){
                 if(transaction.State == DNS_ClientTransactionState.Completed || transaction.State == DNS_ClientTransactionState.Disposed){ 
                     retVal = transaction.Response;
 
-                    wait.Set();
+                    if(wait != null){
+                        wait.Set();
+                        wait.Close();
+                        wait = null;
+                    }
                 }
             };
             transaction.Start();
-
+            
             // Wait transaction to complete.
-            wait.WaitOne();
-            wait.Close();
+            wait.WaitOne();            
 
             return retVal;
 		}
@@ -1636,7 +1643,7 @@ namespace LumiSoft.Net.DNS.Client
                 if(m_IsDisposed){
                     return;
                 }
-                                
+      
                 DnsServerResponse serverResponse = ParseQuery(e.Buffer);
                 DNS_ClientTransaction transaction = null;
                 // Pass response to transaction.
@@ -1669,8 +1676,10 @@ namespace LumiSoft.Net.DNS.Client
             bool retVal = GetQNameI(reply,ref offset,ref name);
 
             // Convert domain name to unicode. For more info see RFC 5890.
-            System.Globalization.IdnMapping ldn = new System.Globalization.IdnMapping();
-            name = ldn.GetUnicode(name);
+            if(name.Length > 0){
+                System.Globalization.IdnMapping ldn = new System.Globalization.IdnMapping();
+                name = ldn.GetUnicode(name);
+            }
 
             return retVal;
         }
