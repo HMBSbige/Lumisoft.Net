@@ -237,7 +237,8 @@ namespace LumiSoft.Net.Mail
                 if(disposition != null && string.Equals(disposition.DispositionType,"attachment",StringComparison.InvariantCultureIgnoreCase)){
                     retVal.Add(entity);
                 }
-                else if(!includeInline && disposition != null && string.Equals(disposition.DispositionType,"inline",StringComparison.InvariantCultureIgnoreCase)){
+                else if(includeInline && disposition != null && string.Equals(disposition.DispositionType,"inline",StringComparison.InvariantCultureIgnoreCase)){
+                    retVal.Add(entity);
                 }
                 else if(contentType != null && contentType.Type.ToLower() == "application"){
                     retVal.Add(entity);
