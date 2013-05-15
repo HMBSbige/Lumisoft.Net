@@ -129,7 +129,7 @@ namespace LumiSoft.Net.IMAP
             // Read "date".
             DateTime date = DateTime.MinValue;
             string dateS = r.ReadWord();            
-            if(string.IsNullOrEmpty(dateS)){
+            if(!string.IsNullOrEmpty(dateS)){
                 date = MIME_Utils.ParseRfc2822DateTime(dateS);
             }
 
