@@ -185,6 +185,8 @@ namespace LumiSoft.Net.DNS.Client
                     }
                     // If server refused to complete query and we more active queries to other servers, skip that response.
                     if(response.ResponseCode == DNS_RCode.REFUSED && m_ResponseCount < Dns_Client.DnsServers.Length){
+                        Dispose();
+
                         return;
                     }
 

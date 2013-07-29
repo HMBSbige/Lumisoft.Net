@@ -291,8 +291,6 @@ namespace LumiSoft.Net.DNS.Client
             transaction.Timeout += delegate(object s,EventArgs e){
                 if(wait != null){
                     wait.Set();
-                    wait.Close();
-                    wait = null;
                 }
             };
             transaction.StateChanged += delegate(object s1,EventArgs<DNS_ClientTransaction> e1){
@@ -301,15 +299,15 @@ namespace LumiSoft.Net.DNS.Client
 
                     if(wait != null){
                         wait.Set();
-                        wait.Close();
-                        wait = null;
                     }
                 }
             };
             transaction.Start();
             
             // Wait transaction to complete.
-            wait.WaitOne();            
+            wait.WaitOne();
+            wait.Close();
+            wait = null;
 
             return retVal;
 		}
