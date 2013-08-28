@@ -3585,7 +3585,7 @@ namespace LumiSoft.Net.IMAP.Server
 
             StringReader r = new StringReader(dataItemsString);
 
-            IMAP_Fetch_DataType fetchDataType = IMAP_Fetch_DataType.FullMessage;
+            IMAP_Fetch_DataType fetchDataType = IMAP_Fetch_DataType.MessageHeader;
 
             // Parse data-items.
             while(r.Available > 0){
@@ -3597,7 +3597,9 @@ namespace LumiSoft.Net.IMAP.Server
                     r.ReadWord();
                     dataItems.Add(new IMAP_t_Fetch_i_BodyStructure());
                     msgDataNeeded = true;
-                    fetchDataType = IMAP_Fetch_DataType.MessageStructure;
+                    if(fetchDataType != IMAP_Fetch_DataType.FullMessage){
+                        fetchDataType = IMAP_Fetch_DataType.MessageStructure;
+                    }
                 }
 
                 #endregion
@@ -3717,7 +3719,7 @@ namespace LumiSoft.Net.IMAP.Server
                     r.ReadWord();
                     dataItems.Add(new IMAP_t_Fetch_i_BodyS());
                     msgDataNeeded = true;
-                    fetchDataType = IMAP_Fetch_DataType.MessageStructure;
+                    fetchDataType = (fetchDataType == IMAP_Fetch_DataType.FullMessage ? IMAP_Fetch_DataType.FullMessage : IMAP_Fetch_DataType.MessageStructure);
                 }
 
                 #endregion
@@ -3728,7 +3730,9 @@ namespace LumiSoft.Net.IMAP.Server
                     r.ReadWord();
                     dataItems.Add(new IMAP_t_Fetch_i_Envelope());
                     msgDataNeeded = true;
-                    fetchDataType = IMAP_Fetch_DataType.MessageHeader;
+                    if(fetchDataType != IMAP_Fetch_DataType.FullMessage && fetchDataType != IMAP_Fetch_DataType.MessageStructure){
+                        fetchDataType = IMAP_Fetch_DataType.MessageHeader;
+                    }
                 }
 
                 #endregion
@@ -3757,7 +3761,9 @@ namespace LumiSoft.Net.IMAP.Server
                     r.ReadWord();
                     dataItems.Add(new IMAP_t_Fetch_i_Rfc822Header());
                     msgDataNeeded = true;
-                    fetchDataType = IMAP_Fetch_DataType.MessageHeader;
+                    if(fetchDataType != IMAP_Fetch_DataType.FullMessage && fetchDataType != IMAP_Fetch_DataType.MessageStructure){
+                        fetchDataType = IMAP_Fetch_DataType.MessageHeader;
+                    }
                 }
 
                 #endregion
@@ -3836,46 +3842,7 @@ namespace LumiSoft.Net.IMAP.Server
                 fetchDataType,
                 new IMAP_r_ServerStatus(cmdTag,"OK","FETCH command completed in %exectime seconds.")
             );
-            fetchEArgs.NewMessageData += new EventHandler<IMAP_e_Fetch.e_NewMessageData>(delegate(object s,IMAP_e_Fetch.e_NewMessageData e){
-                /*
-                // Build response data-items.
-                List<IMAP_t_Fetch_r_i> responseItems = new List<IMAP_t_Fetch_r_i>();
-                foreach(IMAP_t_Fetch_i dataItem in dataItems){
-                    if(dataItem is IMAP_t_Fetch_i_BodyS){
-                        //responseItems.Add(new IMAP_t_Fetch_r_i_Uid(e.MessageInfo.UID));
-                    }
-                    else if(dataItem is IMAP_t_Fetch_i_Body){
-                        //responseItems.Add(new IMAP_t_Fetch_r_i_Uid(e.MessageInfo.UID));
-                    }
-                    else if(dataItem is IMAP_t_Fetch_i_BodyStructure){
-                        //responseItems.Add(new IMAP_t_Fetch_r_i_Uid(e.MessageInfo.UID));
-                    }
-                    else if(dataItem is IMAP_t_Fetch_i_Envelope){
-                        //responseItems.Add(new IMAP_t_Fetch_r_i_Uid(e.MessageInfo.UID));
-                    }
-                    else if(dataItem is IMAP_t_Fetch_i_Flags){
-                        responseItems.Add(new IMAP_t_Fetch_r_i_Flags(new IMAP_t_MsgFlags(e.MessageInfo.Flags)));
-                    }
-                    else if(dataItem is IMAP_t_Fetch_i_InternalDate){
-                        responseItems.Add(new IMAP_t_Fetch_r_i_InternalDate(e.MessageInfo.InternalDate));
-                    }
-                    else if(dataItem is IMAP_t_Fetch_i_Rfc822){
-                        //responseItems.Add(new IMAP_t_Fetch_r_i_Uid(e.MessageInfo.UID));
-                    }
-                    else if(dataItem is IMAP_t_Fetch_i_Rfc822Header){
-                        //responseItems.Add(new IMAP_t_Fetch_r_i_Uid(e.MessageInfo.UID));
-                    }
-                    else if(dataItem is IMAP_t_Fetch_i_Rfc822Size){
-                        responseItems.Add(new IMAP_t_Fetch_r_i_Rfc822Size(e.MessageInfo.Size));
-                    }
-                    else if(dataItem is IMAP_t_Fetch_i_Rfc822Text){
-                        //responseItems.Add(new IMAP_t_Fetch_r_i_Uid(e.MessageInfo.UID));
-                    }
-                    else if(dataItem is IMAP_t_Fetch_i_Uid){
-                        responseItems.Add(new IMAP_t_Fetch_r_i_Uid(e.MessageInfo.UID));
-                    }
-                }*/
-
+            fetchEArgs.NewMessageData += new EventHandler<IMAP_e_Fetch.e_NewMessageData>(delegate(object s,IMAP_e_Fetch.e_NewMessageData e){                
                 StringBuilder reponseBuffer = new StringBuilder();
                 reponseBuffer.Append("* " + e.MessageInfo.SeqNo + " FETCH (");
 
