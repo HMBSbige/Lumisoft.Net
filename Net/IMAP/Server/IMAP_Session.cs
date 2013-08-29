@@ -3627,7 +3627,10 @@ namespace LumiSoft.Net.IMAP.Server
                             // Not part number.
                             if(!Net_Utils.IsInteger(section_parts[0])){
                                 // We must have one of the following values here (HEADER,HEADER.FIELDS,HEADER.FIELDS.NOT,MIME,TEXT).
-                                if(remainingSection.Equals("HEADER",StringComparison.InvariantCultureIgnoreCase)){                        
+                                if(remainingSection.Equals("HEADER",StringComparison.InvariantCultureIgnoreCase)){
+                                    if(fetchDataType != IMAP_Fetch_DataType.FullMessage && fetchDataType != IMAP_Fetch_DataType.MessageStructure){
+                                        fetchDataType = IMAP_Fetch_DataType.MessageHeader;
+                                    }
                                 }
                                 else if(remainingSection.Equals("HEADER.FIELDS",StringComparison.InvariantCultureIgnoreCase)){
                                     rSection.ReadToFirstChar();
@@ -3637,6 +3640,10 @@ namespace LumiSoft.Net.IMAP.Server
                                         return;
                                     }
                                     rSection.ReadParenthesized();
+
+                                    if(fetchDataType != IMAP_Fetch_DataType.FullMessage && fetchDataType != IMAP_Fetch_DataType.MessageStructure){
+                                        fetchDataType = IMAP_Fetch_DataType.MessageHeader;
+                                    }
                                 }
                                 else if(remainingSection.Equals("HEADER.FIELDS.NOT",StringComparison.InvariantCultureIgnoreCase)){
                                     rSection.ReadToFirstChar();
@@ -3646,10 +3653,16 @@ namespace LumiSoft.Net.IMAP.Server
                                         return;
                                     }
                                     rSection.ReadParenthesized();
+
+                                    if(fetchDataType != IMAP_Fetch_DataType.FullMessage && fetchDataType != IMAP_Fetch_DataType.MessageStructure){
+                                        fetchDataType = IMAP_Fetch_DataType.MessageHeader;
+                                    }
                                 }
                                 else if(remainingSection.Equals("MIME",StringComparison.InvariantCultureIgnoreCase)){
+                                    fetchDataType = IMAP_Fetch_DataType.FullMessage;
                                 }
                                 else if(remainingSection.Equals("TEXT",StringComparison.InvariantCultureIgnoreCase)){
+                                    fetchDataType = IMAP_Fetch_DataType.FullMessage;
                                 }
                                 // Unknown parts specifier.
                                 else{
@@ -3708,7 +3721,6 @@ namespace LumiSoft.Net.IMAP.Server
                         dataItems.Add(new IMAP_t_Fetch_i_Body(section,offset,maxCount));
                     }
                     msgDataNeeded = true;
-                    fetchDataType = IMAP_Fetch_DataType.FullMessage;
                 }
 
                 #endregion
