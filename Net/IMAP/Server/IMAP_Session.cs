@@ -3616,6 +3616,7 @@ namespace LumiSoft.Net.IMAP.Server
                                                                             
                     // Full message wanted.
                     if(string.IsNullOrEmpty(section)){
+                        fetchDataType = IMAP_Fetch_DataType.FullMessage;
                     }
                     else{
                         // Left-side part-items must be numbers, only last one may be (HEADER,HEADER.FIELDS,HEADER.FIELDS.NOT,MIME,TEXT).
