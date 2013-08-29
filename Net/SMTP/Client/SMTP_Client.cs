@@ -2030,7 +2030,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
 
@@ -2069,7 +2071,7 @@ namespace LumiSoft.Net.SMTP.Client
 
             #endregion
 
-            #region method MailCommandSendingCompleted
+            #region method RcptCommandSendingCompleted
 
             /// <summary>
             /// Is called when RCPT command sending has finished.
@@ -2091,7 +2093,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
             }
@@ -2132,7 +2136,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    }
                 }
 
                 op.Dispose();
