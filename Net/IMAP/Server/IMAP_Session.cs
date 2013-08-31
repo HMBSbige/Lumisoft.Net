@@ -3732,7 +3732,9 @@ namespace LumiSoft.Net.IMAP.Server
                     r.ReadWord();
                     dataItems.Add(new IMAP_t_Fetch_i_BodyS());
                     msgDataNeeded = true;
-                    fetchDataType = (fetchDataType == IMAP_Fetch_DataType.FullMessage ? IMAP_Fetch_DataType.FullMessage : IMAP_Fetch_DataType.MessageStructure);
+                    if(fetchDataType != IMAP_Fetch_DataType.FullMessage){
+                        fetchDataType = IMAP_Fetch_DataType.MessageStructure;
+                    }
                 }
 
                 #endregion
