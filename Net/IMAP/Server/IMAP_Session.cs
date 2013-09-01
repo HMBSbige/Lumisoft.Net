@@ -3674,6 +3674,12 @@ namespace LumiSoft.Net.IMAP.Server
 
                                 break;
                             }
+                            else{
+                                // For parts specifier, minimum is message structure.
+                                if(fetchDataType != IMAP_Fetch_DataType.FullMessage){
+                                    fetchDataType = IMAP_Fetch_DataType.MessageStructure;
+                                }
+                            }
 
                             if(section_parts.Length == 2){
                                 remainingSection = section_parts[1];
