@@ -300,7 +300,9 @@ namespace LumiSoft.Net.TCP
                 catch(Exception x){
                     m_pException = x;
                     CleanupSocketRelated();
-                    m_pTcpClient.LogAddException("Exception: " + x.Message,x);
+                    if(m_pTcpClient != null){
+                        m_pTcpClient.LogAddException("Exception: " + x.Message,x);
+                    }
                     SetState(AsyncOP_State.Completed);
 
                     return false;
@@ -371,7 +373,9 @@ namespace LumiSoft.Net.TCP
                 catch(Exception x){
                     m_pException = x;
                     CleanupSocketRelated();
-                    m_pTcpClient.LogAddException("Exception: " + x.Message,x);
+                    if(m_pTcpClient != null){
+                        m_pTcpClient.LogAddException("Exception: " + x.Message,x);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
             }
@@ -396,7 +400,9 @@ namespace LumiSoft.Net.TCP
                 catch(Exception x){
                     m_pException = x;
                     CleanupSocketRelated();
-                    m_pTcpClient.LogAddException("Exception: " + x.Message,x);
+                    if(m_pTcpClient != null){
+                        m_pTcpClient.LogAddException("Exception: " + x.Message,x);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
             }
