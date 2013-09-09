@@ -144,7 +144,22 @@ namespace LumiSoft.Net.Mime.vCard
         public void Parse(FileStream stream) {
             List<string> fileStrings = new List<string>();
             string line = "";
-            TextReader r = new StreamReader(stream, System.Text.Encoding.Default); 
+            TextReader r = new StreamReader(stream,System.Text.Encoding.Default); 
+            while (line != null) {
+                line = r.ReadLine();
+                fileStrings.Add(line);
+            }
+            ParseStrings(fileStrings);
+        }
+
+        /// <summary>
+        /// Parses single vCard from the specified stream.
+        /// </summary>
+        /// <param name="stream">Stream what contains vCard.</param>
+        public void Parse(Stream stream) {
+            List<string> fileStrings = new List<string>();
+            string line = "";
+            TextReader r = new StreamReader(stream,System.Text.Encoding.Default); 
             while (line != null) {
                 line = r.ReadLine();
                 fileStrings.Add(line);
