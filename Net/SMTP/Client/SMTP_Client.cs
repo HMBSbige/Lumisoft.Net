@@ -297,7 +297,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
 
@@ -358,7 +360,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
             }
@@ -430,7 +434,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
 
@@ -461,7 +467,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
             }
@@ -513,7 +521,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    }
                 }
 
                 op.Dispose();
@@ -779,7 +789,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
 
@@ -840,7 +852,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
             }
@@ -906,7 +920,9 @@ namespace LumiSoft.Net.SMTP.Client
                 op.Dispose();
 
                 if(m_pException != null){
-                    m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
             }
@@ -938,7 +954,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    }
                 }
 
                 op.Dispose();
@@ -1233,7 +1251,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
 
@@ -1294,7 +1314,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
             }
@@ -1340,7 +1362,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
             }
@@ -1629,7 +1653,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
 
@@ -1690,7 +1716,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
             }
@@ -1729,7 +1757,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    }
                 }
 
                 op.Dispose();
@@ -2416,7 +2446,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
 
@@ -2500,7 +2532,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
             }
@@ -2529,7 +2563,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    }
                     SetState(AsyncOP_State.Completed);   
                 }
             }
@@ -2580,7 +2616,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
 
@@ -2611,7 +2649,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    }
                     SetState(AsyncOP_State.Completed);    
                 }
             }
@@ -2658,7 +2698,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
 
@@ -2702,7 +2744,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
 
@@ -2741,7 +2785,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + m_pException.Message,m_pException);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
 
@@ -2949,7 +2995,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
 
@@ -3010,7 +3058,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
             }
@@ -3054,7 +3104,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    }
                 }
 
                 SetState(AsyncOP_State.Completed);
@@ -3261,7 +3313,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
 
@@ -3322,7 +3376,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    }
                     SetState(AsyncOP_State.Completed);
                 }
             }
@@ -3366,7 +3422,9 @@ namespace LumiSoft.Net.SMTP.Client
                 }
                 catch(Exception x){
                     m_pException = x;
-                    m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    if(m_pSmtpClient != null){
+                        m_pSmtpClient.LogAddException("Exception: " + x.Message,x);
+                    }
                 }
 
                 op.Dispose();
