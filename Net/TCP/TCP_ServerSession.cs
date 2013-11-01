@@ -137,7 +137,9 @@ namespace LumiSoft.Net.TCP
                         // Operation failed.
                         if(e.Error != null){
                             LogAddException(e.Error);
-                            Disconnect();
+                            if(!this.IsDisposed){
+                                Disconnect();
+                            }
                         }
                         // Operation suceeded.
                         else{
@@ -149,7 +151,9 @@ namespace LumiSoft.Net.TCP
                     }
                     catch(Exception x){
                         LogAddException(x);
-                        Disconnect();
+                        if(!this.IsDisposed){
+                            Disconnect();
+                        }
                     }
                 };
 
