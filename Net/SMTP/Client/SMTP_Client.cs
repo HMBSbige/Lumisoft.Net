@@ -4026,6 +4026,28 @@ namespace LumiSoft.Net.SMTP.Client
                 throw new ArgumentNullException("message");
             }
 
+            QuickSendSmartHost(null,host,port,ssl,null,null,message);
+        }
+
+        /// <summary>
+        /// Sends message by using specified smart host.
+        /// </summary>
+        /// <param name="localHost">Host name which is reported to SMTP server.</param>
+        /// <param name="host">Host name or IP address.</param>
+        /// <param name="port">Host port.</param>
+        /// <param name="ssl">Specifies if connected via SSL.</param>
+        /// <param name="userName">SMTP server user name. This value may be null, then authentication not used.</param>
+        /// <param name="password">SMTP server password.</param>
+        /// <param name="message">Mail message to send.</param>
+        /// <exception cref="ArgumentNullException">Is raised when argument <b>host</b> or <b>message</b> is null.</exception>
+        /// <exception cref="ArgumentException">Is raised when any of the method arguments has invalid value.</exception>
+        /// <exception cref="SMTP_ClientException">Is raised when SMTP server returns error.</exception>
+        public static void QuickSendSmartHost(string localHost,string host,int port,bool ssl,string userName,string password,Mail_Message message)
+        {
+            if(message == null){
+                throw new ArgumentNullException("message");
+            }
+
             string from = "";
             if(message.From != null && message.From.Count > 0){
                 from = ((Mail_t_Mailbox)message.From[0]).Address;
@@ -4054,12 +4076,10 @@ namespace LumiSoft.Net.SMTP.Client
                 message.Bcc.Clear();
 			}
 
-            foreach(string recipient in recipients){
-                MemoryStream ms = new MemoryStream();
-                message.ToStream(ms,new MIME_Encoding_EncodedWord(MIME_EncodedWordEncoding.Q,Encoding.UTF8),Encoding.UTF8);
-                ms.Position = 0;
-                QuickSendSmartHost(null,host,port,ssl,null,null,from,new string[]{recipient},ms);
-            }            
+            MemoryStream ms = new MemoryStream();
+            message.ToStream(ms,new MIME_Encoding_EncodedWord(MIME_EncodedWordEncoding.Q,Encoding.UTF8),Encoding.UTF8);
+            ms.Position = 0;
+            QuickSendSmartHost(localHost,host,port,ssl,userName,password,from,recipients.ToArray(),ms);
         }
 
         /// <summary>
