@@ -448,7 +448,6 @@ namespace LumiSoft.Net.TCP
         /// <summary>
         /// Disconnects session.
         /// </summary>
-        /// <exception cref="ObjectDisposedException">Is raised when this object is disposed and this property is accessed.</exception>
         public override void Disconnect()
         {
             Disconnect(null);
@@ -458,11 +457,10 @@ namespace LumiSoft.Net.TCP
         /// Disconnects session.
         /// </summary>
         /// <param name="text">Text what is sent to connected host before disconnecting.</param>
-        /// <exception cref="ObjectDisposedException">Is raised when this object is disposed and this method is accessed.</exception>
         public void Disconnect(string text)
         {
             if(m_IsDisposed){
-                throw new ObjectDisposedException("TCP_ServerSession");
+                return;
             }
             if(m_IsTerminated){
                 return;
