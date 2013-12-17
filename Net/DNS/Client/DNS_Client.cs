@@ -67,8 +67,6 @@ namespace LumiSoft.Net.DNS.Client
                                 }
                             }
                         }
-
-                        break;
                     }
                 }
 
