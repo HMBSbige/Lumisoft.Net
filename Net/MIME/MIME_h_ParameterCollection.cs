@@ -57,7 +57,7 @@ namespace LumiSoft.Net.MIME
                 }
 
                 // Add parameter to list.
-                m_pParts.Add(index,value);
+                m_pParts[index] = value;
             }
 
             #endregion
