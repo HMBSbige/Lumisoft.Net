@@ -29,6 +29,7 @@ namespace LumiSoft.Net.TCP
         private bool                      m_IsSsl         = false;
         private bool                      m_IsSecure      = false;
         private X509Certificate           m_pCertificate  = null;
+        private NetworkStream             m_pRawTcpStream = null;
         private SmartStream               m_pTcpStream    = null;
         private object                    m_pTag          = null;
         private Dictionary<string,object> m_pTags         = null;
@@ -76,6 +77,10 @@ namespace LumiSoft.Net.TCP
                 m_pTcpStream.Dispose();
             }
             m_pTcpStream = null;
+            if(m_pRawTcpStream != null){
+                m_pRawTcpStream.Close();
+            }
+            m_pRawTcpStream = null;
             m_pTags = null;
 
             // Release events.
@@ -113,7 +118,8 @@ namespace LumiSoft.Net.TCP
             socket.ReceiveBufferSize = 32000;
             socket.SendBufferSize = 32000;
 
-            m_pTcpStream = new SmartStream(new NetworkStream(socket,true),true);
+            m_pRawTcpStream = new NetworkStream(socket,true);
+            m_pTcpStream    = new SmartStream(m_pRawTcpStream,true);
         }
 
         #endregion
