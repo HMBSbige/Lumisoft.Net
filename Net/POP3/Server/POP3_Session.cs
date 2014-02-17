@@ -236,9 +236,6 @@ namespace LumiSoft.Net.POP3.Server
                 else if(cmd == "PASS"){
                     PASS(args);
                 }
-                else if(cmd == "PASS"){
-                    PASS(args);
-                }
                 else if(cmd == "AUTH"){
                     AUTH(args);
                 }
@@ -265,9 +262,6 @@ namespace LumiSoft.Net.POP3.Server
                 }
                 else if(cmd == "RSET"){
                     RSET(args);
-                }
-                else if(cmd == "DELE"){
-                    DELE(args);
                 }
                 else if(cmd == "CAPA"){
                     CAPA(args);
