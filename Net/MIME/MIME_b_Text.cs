@@ -121,6 +121,10 @@ namespace LumiSoft.Net.MIME
                 else if(string.Equals(this.Entity.ContentType.Param_Charset,"cp1252",StringComparison.InvariantCultureIgnoreCase)){
                     return Encoding.GetEncoding("windows-1252");
                 }
+                // utf8 is invalid(must be utf-8), consider it as utf-8.
+                else if(string.Equals(this.Entity.ContentType.Param_Charset,"utf8",StringComparison.InvariantCultureIgnoreCase)){
+                    return Encoding.GetEncoding("utf-8");
+                }
                 else{
                     return Encoding.GetEncoding(this.Entity.ContentType.Param_Charset);
                 }
