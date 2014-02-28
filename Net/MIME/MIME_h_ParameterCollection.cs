@@ -52,7 +52,8 @@ namespace LumiSoft.Net.MIME
                 if(encoded && index == 0){
                     // Syntax: <charset>'<language>'<value>
                     string[] charset_language_value = value.Split('\'');
-                    m_pEncoding = Encoding.GetEncoding(charset_language_value[0]);
+                    // If charset missing, consider it as us-ascii.
+                    m_pEncoding = Encoding.GetEncoding(string.IsNullOrEmpty(charset_language_value[0]) ? "us-ascii" : charset_language_value[0]);
                     value = charset_language_value[2];
                 }
 
