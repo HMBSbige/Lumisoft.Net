@@ -60,7 +60,7 @@ namespace LumiSoft.Net.SIP.Message
             
             // Parse uri
             // Read to LAQUOT
-            reader.QuotedReadToDelimiter('<');
+            reader.ReadToFirstChar();
             if(!reader.StartsWith("<")){
                 throw new SIP_ParseException("Invalid Alert-Info value, Uri not between <> !");
             }
