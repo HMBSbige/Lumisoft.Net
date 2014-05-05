@@ -26,7 +26,7 @@ namespace LumiSoft.Net.MIME
                 throw new ArgumentNullException("contentType");
             }
 
-            m_pEncodedDataStream = new MemoryStreamEx(32000);
+            m_pEncodedDataStream = new MemoryStreamEx(64000);
         }
 
         /// <summary>
