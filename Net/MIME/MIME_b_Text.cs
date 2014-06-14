@@ -96,8 +96,7 @@ namespace LumiSoft.Net.MIME
         }
 
         #endregion
-
-
+        
         #region method GetCharset
 
         /// <summary>
@@ -105,7 +104,7 @@ namespace LumiSoft.Net.MIME
         /// </summary>
         /// <returns>Returns content charset.</returns>
         /// <exception cref="ArgumentException">Is raised when Content-Type has not supported charset parameter value.</exception>
-        private Encoding GetCharset()
+        public Encoding GetCharset()
         {
             // RFC 2046 4.1.2. The default character set, US-ASCII.
             
