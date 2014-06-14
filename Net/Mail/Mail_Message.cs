@@ -1996,6 +1996,28 @@ namespace LumiSoft.Net.Mail
         }
 
         /// <summary>
+        /// Gets message body text encoding . Returns null if no body text available.
+        /// </summary>
+        /// <exception cref="ObjectDisposedException">Is raised when this object is disposed and this property is accessed.</exception>
+        public Encoding BodyTextEncoding
+        {
+            get
+            {
+                if(this.IsDisposed){
+                    throw new ObjectDisposedException(this.GetType().Name);
+                }
+
+                foreach(MIME_Entity e in GetAllEntities(false)){
+                    if(e.Body.MediaType.ToLower() == MIME_MediaTypes.Text.plain){
+                        return ((MIME_b_Text)e.Body).GetCharset();
+                    }
+                }
+
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Gets message body text. Returns null if no body text available.
         /// </summary>
         /// <exception cref="ObjectDisposedException">Is raised when this object is disposed and this property is accessed.</exception>
