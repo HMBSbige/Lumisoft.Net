@@ -584,7 +584,7 @@ namespace LumiSoft.Net.SMTP.Relay
                 }
                 else{
                     // Start TLS requested, start switching to secure.
-                    if(!m_pSmtpClient.IsSecureConnection && m_pActiveTarget.SslMode == SslMode.TLS){
+                    if(!m_pSmtpClient.IsSecureConnection && ((m_pServer.UseTlsIfPossible && IsTlsSupported()) || m_pActiveTarget.SslMode == SslMode.TLS)){
                         SMTP_Client.StartTlsAsyncOP startTlsOP = new SMTP_Client.StartTlsAsyncOP(null);
                         startTlsOP.CompletedAsync += delegate(object s,EventArgs<SMTP_Client.StartTlsAsyncOP> e){
                             StartTlsCommandCompleted(startTlsOP);
@@ -654,7 +654,8 @@ namespace LumiSoft.Net.SMTP.Relay
                 }
                 else{
                     // Do EHLO/HELO.
-                    SMTP_Client.EhloHeloAsyncOP ehloOP = new SMTP_Client.EhloHeloAsyncOP(null);
+                    string hostName = string.IsNullOrEmpty(m_pLocalBindInfo.HostName) ? Dns.GetHostName() : m_pLocalBindInfo.HostName;
+                    SMTP_Client.EhloHeloAsyncOP ehloOP = new SMTP_Client.EhloHeloAsyncOP(hostName);
                     ehloOP.CompletedAsync += delegate(object s,EventArgs<SMTP_Client.EhloHeloAsyncOP> e){
                         EhloCommandCompleted(ehloOP);
                     };
@@ -892,6 +893,25 @@ namespace LumiSoft.Net.SMTP.Relay
         {
             foreach(string feature in m_pSmtpClient.EsmtpFeatures){
                 if(string.Equals(feature,SMTP_ServiceExtensions.DSN,StringComparison.InvariantCultureIgnoreCase)){
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        #endregion
+
+        #region method IsTlsSupported
+
+        /// <summary>
+        /// Gets if STASRTTLS extention is supported by remote server.
+        /// </summary>
+        /// <returns></returns>
+        private bool IsTlsSupported()
+        {
+            foreach(string feature in m_pSmtpClient.EsmtpFeatures){
+                if(string.Equals(feature,SMTP_ServiceExtensions.STARTTLS,StringComparison.InvariantCultureIgnoreCase)){
                     return true;
                 }
             }

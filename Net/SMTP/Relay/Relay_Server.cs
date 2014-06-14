@@ -40,6 +40,7 @@ namespace LumiSoft.Net.SMTP.Relay
         private CircleCollection<IPBindInfo>         m_pLocalEndPointIPv6    = null;
         private long                                 m_MaxConnections        = 0;
         private long                                 m_MaxConnectionsPerIP   = 0;
+        private bool                                 m_UseTlsIfPossible      = false; 
         private Dns_Client                           m_pDsnClient            = null;
         private TCP_SessionCollection<Relay_Session> m_pSessions             = null;
         private Dictionary<IPAddress,long>           m_pConnectionsPerIP     = null;
@@ -634,6 +635,29 @@ namespace LumiSoft.Net.SMTP.Relay
                 }
 
                 m_MaxConnectionsPerIP = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets if TLS is used when remote server supports it.
+        /// </summary>
+        /// <exception cref="ObjectDisposedException">Is raised when this object is disposed and this property is accessed.</exception>
+        public bool UseTlsIfPossible
+        {
+            get{ 
+                if(m_IsDisposed){
+                    throw new ObjectDisposedException(this.GetType().Name);
+                }
+                
+                return m_UseTlsIfPossible; 
+            }
+
+            set{
+                if(m_IsDisposed){
+                    throw new ObjectDisposedException(this.GetType().Name);
+                }
+
+                m_UseTlsIfPossible = value;
             }
         }
 
