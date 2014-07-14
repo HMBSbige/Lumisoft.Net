@@ -624,6 +624,8 @@ namespace LumiSoft.Net.IMAP.Client
                         // IMAP server returned error response.
                         if(op.FinalResponse.IsError){
                             m_pException = new IMAP_ClientException(op.FinalResponse);
+
+                            SetState(AsyncOP_State.Completed);
                         }
                         // IMAP server returned success response.
                         else{
@@ -633,7 +635,7 @@ namespace LumiSoft.Net.IMAP.Client
                                 if(e.Value.Error != null){
                                     m_pException = e.Value.Error;
                                 }
-                                
+                          
                                 SetState(AsyncOP_State.Completed);
                             };
                             // Operation completed synchronously.
@@ -646,8 +648,6 @@ namespace LumiSoft.Net.IMAP.Client
                             }
                         }
                     }
-
-                    SetState(AsyncOP_State.Completed);
                 }
                 finally{
                     op.Dispose();
