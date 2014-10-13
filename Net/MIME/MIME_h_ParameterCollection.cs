@@ -103,9 +103,10 @@ namespace LumiSoft.Net.MIME
 
         #endregion
 
-        private bool                                m_IsModified  = false;
-        private MIME_h                              m_pOwner      = null;
-        private Dictionary<string,MIME_h_Parameter> m_pParameters = null;
+        private bool                                m_IsModified    = false;
+        private MIME_h                              m_pOwner        = null;
+        private Dictionary<string,MIME_h_Parameter> m_pParameters   = null;
+        private bool                                m_EncodeRfc2047 = false;
 
         /// <summary>
         /// Default constructor.
@@ -211,7 +212,11 @@ namespace LumiSoft.Net.MIME
                 else if((charset == null || Net_Utils.IsAscii(parameter.Value)) && parameter.Value.Length < 76){
                     retVal.Append(";\r\n\t" + parameter.Name + "=" + TextUtils.QuoteString(parameter.Value));
                 }
-                // We need to encode/split value.
+                // Use RFC 2047 to encode parameter.
+                else if(m_EncodeRfc2047){
+                    retVal.Append(";\r\n\t" + parameter.Name + "=" + TextUtils.QuoteString(MIME_Encoding_EncodedWord.EncodeS(MIME_EncodedWordEncoding.B,Encoding.UTF8,false,parameter.Value)));
+                }
+                // We need to RFC 2231 encode/split value.
                 else{
                     byte[] byteValue = charset.GetBytes(parameter.Value);
 
@@ -501,6 +506,16 @@ namespace LumiSoft.Net.MIME
                     m_pParameters.Add(name,new MIME_h_Parameter(name,value));
                 }
             }
+        }
+
+        /// <summary>
+        /// If true RFC 2047 is used to encode parameters, if false RFC 2231 is used.
+        /// </summary>
+        public bool EncodeRfc2047
+        {
+            get{ return m_EncodeRfc2047; }
+
+            set{ m_EncodeRfc2047 = value; }
         }
 
         #endregion
