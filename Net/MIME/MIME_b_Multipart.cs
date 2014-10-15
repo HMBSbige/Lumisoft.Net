@@ -115,13 +115,14 @@ namespace LumiSoft.Net.MIME
 
             #endregion
 
-            private State                       m_State         = State.SeekFirst;
-            private SmartStream                 m_pStream       = null;
-            private string                      m_Boundary      = "";
-            private _DataLine                   m_pPreviousLine = null;
-            private SmartStream.ReadLineAsyncOP m_pReadLineOP   = null;
-            private StringBuilder               m_pTextPreamble = null;
-            private StringBuilder               m_pTextEpilogue = null;
+            private State                       m_State                       = State.SeekFirst;
+            private SmartStream                 m_pStream                     = null;
+            private string                      m_Boundary                    = "";
+            private _DataLine                   m_pPreviousLine               = null;
+            private SmartStream.ReadLineAsyncOP m_pReadLineOP                 = null;
+            private bool                        m_StartBoundaryPreCrlfMissing = false;
+            private StringBuilder               m_pTextPreamble               = null;
+            private StringBuilder               m_pTextEpilogue               = null;
 
             /// <summary>
             /// Default constructor.
@@ -215,6 +216,11 @@ namespace LumiSoft.Net.MIME
                                 // We have next boundary.
                                 else if("--" + m_Boundary == boundary){
                                     m_State = State.InBoundary;
+
+                                    // Start boundary preceeding CRLF is mssing.
+                                    if(m_pTextPreamble.Length == 0){
+                                        m_StartBoundaryPreCrlfMissing = true;
+                                    }
 
                                     // Last CRLF is no part of preamble, but is part of boundary-tag.
                                     if(m_pTextPreamble.Length >= 2){
@@ -524,6 +530,14 @@ namespace LumiSoft.Net.MIME
                     throw new NotSupportedException();
                 }
             }
+
+            /// <summary>
+            /// True if start boundary preceeding CRLF is missing (CRLF--boundary).
+            /// </summary>
+            public bool StartBoundaryPreCrlfMissing
+            {
+                get{ return m_StartBoundaryPreCrlfMissing; }
+            }
                         
             /// <summary>
             /// Gets "preamble" text. Defined in RFC 2046 5.1.1.
@@ -556,10 +570,11 @@ namespace LumiSoft.Net.MIME
 
         #endregion
 
-        private MIME_h_ContentType    m_pContentType = null;
-        private MIME_EntityCollection m_pBodyParts   = null;
-        private string                m_TextPreamble = "";
-        private string                m_TextEpilogue = "";
+        private MIME_h_ContentType    m_pContentType                = null;
+        private MIME_EntityCollection m_pBodyParts                  = null;
+        private bool                  m_StartBoundaryPreCrlfMissing = false;
+        private string                m_TextPreamble                = "";
+        private string                m_TextEpilogue                = "";
         
         /// <summary>
         /// Default constructor.
@@ -653,8 +668,9 @@ namespace LumiSoft.Net.MIME
                 entity.SetParent(owner);
             }
 
-            body.m_TextPreamble = multipartReader.TextPreamble;
-            body.m_TextEpilogue = multipartReader.TextEpilogue;
+            body.m_StartBoundaryPreCrlfMissing = multipartReader.StartBoundaryPreCrlfMissing;
+            body.m_TextPreamble                = multipartReader.TextPreamble;
+            body.m_TextEpilogue                = multipartReader.TextEpilogue;
 
             body.BodyParts.SetModified(false);
         }
@@ -712,10 +728,18 @@ namespace LumiSoft.Net.MIME
 
             for(int i=0;i<m_pBodyParts.Count;i++){
                 MIME_Entity bodyPart = m_pBodyParts[i];
-                // Start new body part.
-                byte[] bStart = Encoding.UTF8.GetBytes("\r\n--" + this.Entity.ContentType.Param_Boundary + "\r\n");
-                stream.Write(bStart,0,bStart.Length);
                 
+                // Start body part and missing boundary-preceeding CRLF.
+                if(i == 0 && m_StartBoundaryPreCrlfMissing){
+                    byte[] bStart = Encoding.UTF8.GetBytes("--" + this.Entity.ContentType.Param_Boundary + "\r\n");
+                    stream.Write(bStart,0,bStart.Length);
+                }
+                // Start new body part.
+                else{
+                    byte[] bStart = Encoding.UTF8.GetBytes("\r\n--" + this.Entity.ContentType.Param_Boundary + "\r\n");
+                    stream.Write(bStart,0,bStart.Length);
+                }
+                                
                 bodyPart.ToStream(stream,headerWordEncoder,headerParmetersCharset,headerReencode);
 
                 // Last body part, close boundary.
