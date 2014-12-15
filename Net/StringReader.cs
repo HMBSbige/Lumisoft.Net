@@ -418,10 +418,10 @@ namespace LumiSoft.Net
 		public bool StartsWith(string value,bool case_sensitive)
 		{
 			if(case_sensitive){
-				return m_SourceString.StartsWith(value);
+				return m_SourceString.StartsWith(value,StringComparison.InvariantCulture);
 			}
 			else{
-				return m_SourceString.ToLower().StartsWith(value.ToLower());
+				return m_SourceString.StartsWith(value,StringComparison.InvariantCultureIgnoreCase);
 			}
 		}
 
@@ -448,7 +448,7 @@ namespace LumiSoft.Net
 		public bool EndsWith(string value,bool case_sensitive)
 		{
 			if(case_sensitive){
-				return m_SourceString.EndsWith(value);
+				return m_SourceString.EndsWith(value,StringComparison.InvariantCulture);
 			}
 			else{
 				return m_SourceString.EndsWith(value,StringComparison.InvariantCultureIgnoreCase);
