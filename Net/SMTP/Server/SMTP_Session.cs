@@ -924,10 +924,10 @@ namespace LumiSoft.Net.SMTP.Server
                 try{
                     if(op.Error != null){
                         if(op.Error is LineSizeExceededException){
-                            SendFinalResponse(new SMTP_t_ReplyLine(503,"500 Line too long.",true));
+                            SendFinalResponse(new SMTP_t_ReplyLine(500,"Line too long.",true));
                         }
                         else if(op.Error is DataSizeExceededException){
-                            SendFinalResponse(new SMTP_t_ReplyLine(503,"552 Too much mail data.",true));
+                            SendFinalResponse(new SMTP_t_ReplyLine(552,"Too much mail data.",true));
                         }
                         else{
                             m_pException = op.Error;
