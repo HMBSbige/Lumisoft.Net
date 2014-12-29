@@ -8714,7 +8714,7 @@ namespace LumiSoft.Net.IMAP.Client
             /// </summary>
             public ReadResponseAsyncOP()
             {
-                m_pReadLineOP = new SmartStream.ReadLineAsyncOP(new byte[64000],SizeExceededAction.JunkAndThrowException);
+                m_pReadLineOP = new SmartStream.ReadLineAsyncOP(new byte[256000],SizeExceededAction.JunkAndThrowException);
                 m_pReadLineOP.Completed += new EventHandler<EventArgs<SmartStream.ReadLineAsyncOP>>(m_pReadLineOP_Completed);
             }
                         
