@@ -619,7 +619,7 @@ namespace LumiSoft.Net.IO
                 }
                 // Normal line.
                 else{
-                    if(m_MaxCount < 1 || m_BytesStored < m_MaxCount){
+                    if(m_MaxCount < 1 || (m_BytesStored + m_pReadLineOP.BytesInBuffer) < m_MaxCount){
                         // Period handling: If line starts with '.', it must be removed.
                         if(m_pReadLineOP.Buffer[0] == '.'){
                             m_pStream.Write(m_pReadLineOP.Buffer,1,m_pReadLineOP.BytesInBuffer - 1);
@@ -632,6 +632,17 @@ namespace LumiSoft.Net.IO
                             m_BytesStored += m_pReadLineOP.BytesInBuffer;
                             m_LinesStored++;
                         }                        
+                    }
+                    // Maximum allowed to store bytes exceeded.
+                    else{
+                        if(m_ExceededAction == SizeExceededAction.ThrowException){
+                            m_pException = new DataSizeExceededException();
+
+                            return true;
+                        }
+                        else if(m_pException == null){
+                            m_pException = new DataSizeExceededException();
+                        }
                     }
                 }
 
