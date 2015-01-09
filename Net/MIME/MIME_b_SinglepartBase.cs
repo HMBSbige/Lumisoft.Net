@@ -123,7 +123,7 @@ namespace LumiSoft.Net.MIME
         /// <param name="contentTransferEncoding">Content-Transfer-Encoding in what encoding <b>stream</b> data is.</param>
         /// <param name="stream">Stream data to add.</param>
         /// <exception cref="ArgumentNullException">Is raised when <b>contentTransferEncoding</b> or <b>stream</b> is null reference.</exception>
-        /// <exception cref="ArgumentException">Is raised when any of the argumennts has invalid value.</exception>
+        /// <exception cref="ArgumentException">Is raised when any of the arguments has invalid value.</exception>
         /// <exception cref="InvalidOperationException">Is raised when this method is accessed and this body is not bounded to any entity.</exception>
         public void SetEncodedData(string contentTransferEncoding,Stream stream)
         {
@@ -271,6 +271,52 @@ namespace LumiSoft.Net.MIME
             using(FileStream fs = File.OpenRead(file)){
                 SetData(fs,transferEncoding);
             }            
+        }
+
+        #endregion
+
+        #region method DataToStream
+
+        /// <summary>
+        /// Stores body decoded-data to the specified stream.
+        /// </summary>
+        /// <param name="stream">Stream where to store body data.</param>
+        /// <exception cref="ArgumentNullException">Is raised when <b>stream</b> is null reference.</exception>
+        public void DataToStream(Stream stream)
+        {
+            if(stream == null){
+                throw new ArgumentNullException("stream");
+            }
+
+            using(Stream dataStream = GetDataStream()){
+                Net_Utils.StreamCopy(dataStream,stream,64000);
+            }
+        }
+
+        #endregion
+
+        #region method DataToFile
+
+        /// <summary>
+        /// Stores body decoded-data to the specified file.
+        /// </summary>
+        /// <param name="fileName">File name with path, where to store body data.</param>
+        /// <exception cref="ArgumentNullException">Is raised when <b>fileName</b> is null reference.</exception>
+        /// <exception cref="ArgumentException">Is raised when any of the arguments has invalid value.</exception>
+        public void DataToFile(string fileName)
+        {
+            if(fileName == null){
+                throw new ArgumentNullException("fileName");
+            }            
+            if(fileName == string.Empty){
+                throw new ArgumentException("Argument 'fileName' value must be specified.");
+            }
+
+            using(Stream fs = File.Create(fileName)){
+                using(Stream dataStream = GetDataStream()){
+                    Net_Utils.StreamCopy(dataStream,fs,64000);
+                }
+            }
         }
 
         #endregion
