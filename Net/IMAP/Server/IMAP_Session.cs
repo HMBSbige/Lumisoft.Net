@@ -5847,7 +5847,11 @@ namespace LumiSoft.Net.IMAP.Server
 				if(entity.Body is MIME_b_MessageRfc822){                    
 					retVal.Append(" " + IMAP_t_Fetch_r_i_Envelope.ConstructEnvelope(((MIME_b_MessageRfc822)entity.Body).Message));
 
-                    // TODO: BODYSTRUCTURE,LINES
+                    // BODYSTRUCTURE
+                    retVal.Append(" NIL");
+
+                    // LINES
+                    retVal.Append(" NIL");
 				}
 
 				// contentLines ---> FOR ContentType: text/xxx ONLY ###
@@ -5862,9 +5866,56 @@ namespace LumiSoft.Net.IMAP.Server
 					}
 						
 					retVal.Append(" " + lineCount.ToString());
-				}
+                }
 
-				retVal.Append(")");
+
+                #region BODYSTRUCTURE extention fields
+
+                if(bodystructure){
+                    // body MD5
+                    retVal.Append(" NIL");
+
+                    // body disposition  Syntax: {(disposition-type [ SP ("name" SP "value" *(SP "name" SP "value"))])}
+				    if(entity.ContentDisposition != null && entity.ContentDisposition.Parameters.Count > 0){
+                        retVal.Append(" (" + entity.ContentDisposition.DispositionType);
+
+                        if(entity.ContentDisposition.Parameters.Count > 0){
+                            retVal.Append(" (");
+
+                            bool first = true;
+                            foreach(MIME_h_Parameter parameter in entity.ContentDisposition.Parameters){
+                                // For the first item, don't add SP.
+                                if(first){
+                                    first = false;
+                                }
+                                else{
+                                    retVal.Append(" ");
+                                }
+
+                                retVal.Append("\"" + parameter.Name + "\" \"" + wordEncoder.Encode(parameter.Value) + "\"");
+                            }
+                            retVal.Append(")");
+                        }
+                        else{
+                            retVal.Append(" NIL");
+                        }
+
+                        retVal.Append(")");
+				    }
+				    else{
+					    retVal.Append(" NIL");
+				    }
+
+                    // body language
+                    retVal.Append(" NIL");
+
+                    // body location
+                    retVal.Append(" NIL");
+                }
+
+                #endregion
+
+                retVal.Append(")");
 			}
 
 			return retVal.ToString();
