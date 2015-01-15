@@ -199,6 +199,68 @@ namespace LumiSoft.Net.MIME
 
         #endregion
 
+        #region method DataToStream
+
+        /// <summary>
+        /// Stores body decoded-data to the specified stream. Note: This method is available for single part entities only.
+        /// </summary>
+        /// <param name="stream">Stream where to store body data.</param>
+        /// <exception cref="ArgumentNullException">Is raised when <b>stream</b> is null reference.</exception>
+        /// <exception cref="ArgumentNullException">Is raised when this method is called for multipart entity.</exception>
+        public void DataToStream(Stream stream)
+        {
+            if(stream == null){
+                throw new ArgumentNullException("stream");
+            }
+            if(this.Body == null){
+                throw new InvalidOperationException("Mime entity body has been not set yet.");
+            }
+            if(!(this.Body is MIME_b_SinglepartBase)){
+                throw new InvalidOperationException("This method is available only for single part entities, not for multipart.");
+            }
+
+            MIME_b_SinglepartBase body = (MIME_b_SinglepartBase)this.Body;
+            using(Stream dataStream = body.GetDataStream()){
+                Net_Utils.StreamCopy(dataStream,stream,64000);
+            }
+        }
+
+        #endregion
+
+        #region method DataToFile
+
+        /// <summary>
+        /// Stores body decoded-data to the specified file. Note: This method is available for single part entities only.
+        /// </summary>
+        /// <param name="fileName">File name with path, where to store body data.</param>
+        /// <exception cref="ArgumentNullException">Is raised when <b>fileName</b> is null reference.</exception>
+        /// <exception cref="ArgumentException">Is raised when any of the arguments has invalid value.</exception>
+        /// <exception cref="ArgumentNullException">Is raised when this method is called for multipart entity.</exception>
+        public void DataToFile(string fileName)
+        {
+            if(fileName == null){
+                throw new ArgumentNullException("fileName");
+            }            
+            if(fileName == string.Empty){
+                throw new ArgumentException("Argument 'fileName' value must be specified.");
+            }
+            if(this.Body == null){
+                throw new InvalidOperationException("Mime entity body has been not set yet.");
+            }
+            if(!(this.Body is MIME_b_SinglepartBase)){
+                throw new InvalidOperationException("This method is available only for single part entities, not for multipart.");
+            }
+
+            MIME_b_SinglepartBase body = (MIME_b_SinglepartBase)this.Body;
+            using(Stream fs = File.Create(fileName)){
+                using(Stream dataStream = body.GetDataStream()){
+                    Net_Utils.StreamCopy(dataStream,fs,64000);
+                }
+            }
+        }
+
+        #endregion
+
 
         #region method Parse
 
