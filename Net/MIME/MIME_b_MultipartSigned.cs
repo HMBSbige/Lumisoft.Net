@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Security.Cryptography;
+using System.Security.Cryptography.Pkcs;
+using System.Security.Cryptography.X509Certificates;
 
 using LumiSoft.Net.IO;
 
@@ -58,23 +61,64 @@ namespace LumiSoft.Net.MIME
 
         #endregion
 
-        /*
-        /// <summary>
-        /// Signs entiy data.
-        /// </summary>
-        /// <param name="cert"></param>
-        public void Sign(X509Certificate2 cert)
-        {
-        }
+
+        #region method GetCertificates
 
         /// <summary>
-        /// Verifies that body content has not changed after it was signed.
+        /// Gets certificates contained in pkcs 7.
         /// </summary>
-        public void Verify()
+        /// <returns>Returns certificates contained in pkcs 7. Returns null if no certificates.</returns>
+        public X509Certificate2Collection GetCertificates()
         {
-            // SignedCms 
-        }*/
-        
+            // multipart/signed must always have only 2 entities, otherwise invalid data.
+            if(this.BodyParts.Count != 2){
+                return null;
+            }
+                
+            // Get signature. It should be 2 entity.
+            MIME_Entity signatureEntity = this.BodyParts[1];
+
+            SignedCms signedCms = new SignedCms();
+            signedCms.Decode(((MIME_b_SinglepartBase)signatureEntity.Body).Data);
+
+            return signedCms.Certificates;
+        }
+
+        #endregion
+
+        #region method VerifySignature
+
+        /// <summary>
+        /// Checks if signature is valid and data not altered.
+        /// </summary>
+        /// <returns>Returns true if signature is valid, otherwise false.</returns>
+        public bool VerifySignature()
+        {
+            // multipart/signed must always have only 2 entities, otherwise invalid data.
+            if(this.BodyParts.Count != 2){
+                return false;
+            }
+                
+            // Get signature. It should be 2 entity.
+            MIME_Entity signatureEntity = this.BodyParts[1];
+                                                 
+            System.IO.MemoryStream tmpStream = new System.IO.MemoryStream();
+            this.BodyParts[0].ToStream(tmpStream,null,null,false);
+
+            try{
+                SignedCms signedCms = new SignedCms(new ContentInfo(tmpStream.ToArray()),true);
+                signedCms.Decode(((MIME_b_SinglepartBase)signatureEntity.Body).Data);
+                signedCms.CheckSignature(true);
+
+                return true;
+            }
+            catch{
+                return false;
+            }
+        }
+
+        #endregion
+
 
         #region Properties implementation
 
