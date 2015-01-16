@@ -261,7 +261,34 @@ namespace LumiSoft.Net.MIME
         // TODO:
         //public MIME_Entity GetEntityByPartsSpecifier(string partsSpecifier)
 
-        
+
+        #region method VerifySignatures
+
+        /// <summary>
+        /// Checks SMIME signed enities signtures. NOTE: For not signed messsages this method always return true.
+        /// </summary>
+        /// <returns>Returns true if all signatures are valid.</returns>
+        /// <exception cref="NotSupportedException">Is raised when entity is signed with not supported encryption.</exception>
+        public bool VerifySignatures()
+        {
+            foreach(MIME_Entity entity in this.AllEntities){
+                if(string.Equals(entity.ContentType.TypeWithSubtype,MIME_MediaTypes.Application.pkcs7_mime,StringComparison.InvariantCultureIgnoreCase)){
+                    if(!((MIME_b_ApplicationPkcs7Mime)entity.Body).VerifySignature()){
+                        return false;
+                    }
+                }
+                else if(string.Equals(entity.ContentType.TypeWithSubtype,MIME_MediaTypes.Multipart.signed,StringComparison.InvariantCultureIgnoreCase)){
+                    if(!((MIME_b_MultipartSigned)entity.Body).VerifySignature()){
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        #endregion
+
 
         #region Properties Implementation
 
