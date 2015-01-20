@@ -2193,54 +2193,59 @@ namespace LumiSoft.Net.IMAP.Server
             // Store start time
 			long startTime = DateTime.Now.Ticks;
 
-            string folder = IMAP_Utils.DecodeMailbox(TextUtils.UnQuoteString(parts[0]));
-            if(!(parts[1].StartsWith("(") && parts[1].EndsWith(")"))){
-                m_pResponseSender.SendResponseAsync(new IMAP_r_ServerStatus(cmdTag,"BAD","Error in arguments."));
-            }
-            else{
-                IMAP_e_Select eSelect = OnSelect(cmdTag,folder);
-                if(eSelect.ErrorResponse != null){
-                    m_pResponseSender.SendResponseAsync(eSelect.ErrorResponse);
-
-                    return;
+            try{
+                string folder = IMAP_Utils.DecodeMailbox(TextUtils.UnQuoteString(parts[0]));
+                if(!(parts[1].StartsWith("(") && parts[1].EndsWith(")"))){
+                    m_pResponseSender.SendResponseAsync(new IMAP_r_ServerStatus(cmdTag,"BAD","Error in arguments."));
                 }
-
-                IMAP_e_MessagesInfo eMessagesInfo = OnGetMessagesInfo(folder);
-                   
-                int  msgCount    = -1;
-                int  recentCount = -1;
-                long uidNext     = -1;
-                long folderUid   = -1;
-                int  unseenCount = -1;
-
-                string[] statusItems = parts[1].Substring(1,parts[1].Length - 2).Split(' ');
-                for(int i=0;i<statusItems.Length;i++){
-                    string statusItem = statusItems[i];
-                    if(string.Equals(statusItem,"MESSAGES",StringComparison.InvariantCultureIgnoreCase)){
-                        msgCount = eMessagesInfo.Exists;
-                    }
-                    else if(string.Equals(statusItem,"RECENT",StringComparison.InvariantCultureIgnoreCase)){
-                        recentCount = eMessagesInfo.Recent;
-                    }
-                    else if(string.Equals(statusItem,"UIDNEXT",StringComparison.InvariantCultureIgnoreCase)){
-                        uidNext = eMessagesInfo.UidNext;
-                    }
-                    else if(string.Equals(statusItem,"UIDVALIDITY",StringComparison.InvariantCultureIgnoreCase)){
-                        folderUid = eSelect.FolderUID;
-                    }
-                    else if(string.Equals(statusItem,"UNSEEN",StringComparison.InvariantCultureIgnoreCase)){
-                        unseenCount = eMessagesInfo.Unseen;
-                    }
-                    // Invalid status item.
-                    else{
-                        m_pResponseSender.SendResponseAsync(new IMAP_r_ServerStatus(cmdTag,"BAD","Error in arguments."));
+                else{
+                    IMAP_e_Select eSelect = OnSelect(cmdTag,folder);
+                    if(eSelect.ErrorResponse != null){
+                        m_pResponseSender.SendResponseAsync(eSelect.ErrorResponse);
 
                         return;
                     }
-                }
+
+                    IMAP_e_MessagesInfo eMessagesInfo = OnGetMessagesInfo(folder);
+                   
+                    int  msgCount    = -1;
+                    int  recentCount = -1;
+                    long uidNext     = -1;
+                    long folderUid   = -1;
+                    int  unseenCount = -1;
+
+                    string[] statusItems = parts[1].Substring(1,parts[1].Length - 2).Split(' ');
+                    for(int i=0;i<statusItems.Length;i++){
+                        string statusItem = statusItems[i];
+                        if(string.Equals(statusItem,"MESSAGES",StringComparison.InvariantCultureIgnoreCase)){
+                            msgCount = eMessagesInfo.Exists;
+                        }
+                        else if(string.Equals(statusItem,"RECENT",StringComparison.InvariantCultureIgnoreCase)){
+                            recentCount = eMessagesInfo.Recent;
+                        }
+                        else if(string.Equals(statusItem,"UIDNEXT",StringComparison.InvariantCultureIgnoreCase)){
+                            uidNext = eMessagesInfo.UidNext;
+                        }
+                        else if(string.Equals(statusItem,"UIDVALIDITY",StringComparison.InvariantCultureIgnoreCase)){
+                            folderUid = eSelect.FolderUID;
+                        }
+                        else if(string.Equals(statusItem,"UNSEEN",StringComparison.InvariantCultureIgnoreCase)){
+                            unseenCount = eMessagesInfo.Unseen;
+                        }
+                        // Invalid status item.
+                        else{
+                            m_pResponseSender.SendResponseAsync(new IMAP_r_ServerStatus(cmdTag,"BAD","Error in arguments."));
+
+                            return;
+                        }
+                    }
                                 
-                m_pResponseSender.SendResponseAsync(new IMAP_r_u_Status(folder,msgCount,recentCount,uidNext,folderUid,unseenCount));
-                m_pResponseSender.SendResponseAsync(new IMAP_r_ServerStatus(cmdTag,"OK","STATUS completed in " + ((DateTime.Now.Ticks - startTime) / (decimal)10000000).ToString("f2") + " seconds."));
+                    m_pResponseSender.SendResponseAsync(new IMAP_r_u_Status(folder,msgCount,recentCount,uidNext,folderUid,unseenCount));
+                    m_pResponseSender.SendResponseAsync(new IMAP_r_ServerStatus(cmdTag,"OK","STATUS completed in " + ((DateTime.Now.Ticks - startTime) / (decimal)10000000).ToString("f2") + " seconds."));
+                }
+            }
+            catch(Exception x){
+                m_pResponseSender.SendResponseAsync(new IMAP_r_ServerStatus(cmdTag,"NO","Error: " + x.Message));
             }
         }
 
@@ -2426,7 +2431,7 @@ namespace LumiSoft.Net.IMAP.Server
                 }
             }
             catch(Exception x){
-                m_pResponseSender.SendResponseAsync(new IMAP_r_ServerStatus(cmdTag,"NO","NO Error: " + x.Message));
+                m_pResponseSender.SendResponseAsync(new IMAP_r_ServerStatus(cmdTag,"NO","Error: " + x.Message));
             }
         }
 
