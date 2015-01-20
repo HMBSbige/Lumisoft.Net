@@ -281,10 +281,10 @@ namespace LumiSoft.Net.AUTH
             */
 
             string A1 = "";
-            if(string.IsNullOrEmpty(this.Algorithm) || this.Algorithm.ToLower() == "md5"){
+            if(string.IsNullOrEmpty(this.Algorithm) || string.Equals(this.Algorithm,"md5",StringComparison.InvariantCultureIgnoreCase)){
                 A1 = userName + ":" + this.Realm + ":" + password;
             }
-            else if(this.Algorithm.ToLower() == "md5-sess"){
+            else if(string.Equals(this.Algorithm,"md5-sess",StringComparison.InvariantCultureIgnoreCase)){
                 A1 = H(userName + ":" + this.Realm + ":" + password) + ":" + this.Nonce + ":" + this.CNonce;
             }
             else{
@@ -292,14 +292,14 @@ namespace LumiSoft.Net.AUTH
             }
 
             string A2 = "";
-            if(string.IsNullOrEmpty(this.Qop) || this.Qop.ToLower() == "auth"){
+            if(string.IsNullOrEmpty(this.Qop) || string.Equals(this.Qop,"auth",StringComparison.InvariantCultureIgnoreCase)){
                 A2 = this.RequestMethod + ":" + this.Uri;
             }
             else{
                 throw new ArgumentException("Invalid 'qop' value '" + this.Qop + "'.");
             }
 
-            if(this.Qop.ToLower() == "auth" || this.Qop.ToLower() == "auth-int"){
+            if(string.Equals(this.Qop,"auth",StringComparison.InvariantCultureIgnoreCase) || string.Equals(this.Qop,"auth-int",StringComparison.InvariantCultureIgnoreCase)){
                 // request-digest  = <"> < KD ( H(A1),unq(nonce-value) ":" nc-value ":" unq(cnonce-value) ":" unq(qop-value) ":" H(A2) )> <">
                 // We don't add quoutes here.
 
@@ -434,6 +434,9 @@ namespace LumiSoft.Net.AUTH
                 authData.Append("cnonce=\"" + m_Cnonce + "\",");
             }
             authData.Append("response=\"" + response + "\",");
+            if(!string.IsNullOrEmpty(m_Algorithm)){
+                authData.Append("algorithm=\"" + m_Algorithm + "\",");
+            }
             if(!string.IsNullOrEmpty(m_Opaque)){
                 authData.Append("opaque=\"" + m_Opaque + "\",");
             }
