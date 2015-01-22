@@ -18,7 +18,7 @@ namespace LumiSoft.Net.MIME
         private X509Certificate2 m_pSignerCert = null;
 
         /// <summary>
-        /// Default constructor. The protocol = 'application/x-pkcs7-signature' and micalg = 'sha1'.
+        /// Default constructor. The protocol = 'application/x-pkcs7-signature',micalg = 'sha1' and boundary = auto-generated.
         /// </summary>
         public MIME_b_MultipartSigned() : base()
         {
