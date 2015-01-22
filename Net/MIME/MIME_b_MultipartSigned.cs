@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Security.Cryptography;
@@ -14,6 +15,20 @@ namespace LumiSoft.Net.MIME
     /// </summary>
     public class MIME_b_MultipartSigned : MIME_b_Multipart
     {
+        private X509Certificate2 m_pSignerCert = null;
+
+        /// <summary>
+        /// Default constructor. The protocol = 'application/x-pkcs7-signature' and micalg = 'sha1'.
+        /// </summary>
+        public MIME_b_MultipartSigned() : base()
+        {
+            MIME_h_ContentType contentType_multipartSigned = new MIME_h_ContentType(MIME_MediaTypes.Multipart.signed);
+            contentType_multipartSigned.Parameters["protocol"] = "application/x-pkcs7-signature";
+            contentType_multipartSigned.Parameters["micalg"]   = "sha1";
+            contentType_multipartSigned.Param_Boundary         = Guid.NewGuid().ToString().Replace('-','.');
+            this.ContentType = contentType_multipartSigned;
+        }
+
         /// <summary>
         /// Default constructor.
         /// </summary>
@@ -62,6 +77,24 @@ namespace LumiSoft.Net.MIME
         #endregion
 
 
+        #region method SetCertificate
+
+        /// <summary>
+        /// Sets signer certificate.
+        /// </summary>
+        /// <param name="signerCert">Signer certificate.</param>
+        /// <exception cref="ArgumentNullException">Is raised when <b>signerCert</b> is null reference.</exception>
+        public void SetCertificate(X509Certificate2 signerCert)
+        {
+            if(signerCert == null){
+                throw new ArgumentNullException("signerCert");
+            }
+
+            m_pSignerCert = signerCert;            
+        }
+
+        #endregion
+
         #region method GetCertificates
 
         /// <summary>
@@ -94,6 +127,10 @@ namespace LumiSoft.Net.MIME
         /// <returns>Returns true if signature is valid, otherwise false.</returns>
         public bool VerifySignature()
         {
+            // Message is signed when it's saved out.
+            if(m_pSignerCert != null){
+                return true;
+            }
             // multipart/signed must always have only 2 entities, otherwise invalid data.
             if(this.BodyParts.Count != 2){
                 return false;
@@ -101,12 +138,13 @@ namespace LumiSoft.Net.MIME
                 
             // Get signature. It should be 2 entity.
             MIME_Entity signatureEntity = this.BodyParts[1];
-                                                 
-            System.IO.MemoryStream tmpStream = new System.IO.MemoryStream();
-            this.BodyParts[0].ToStream(tmpStream,null,null,false);
+                       
+            // Store entity to tmp stream.              
+            MemoryStream tmpDataEntityStream = new MemoryStream();
+            this.BodyParts[0].ToStream(tmpDataEntityStream,null,null,false);
 
             try{
-                SignedCms signedCms = new SignedCms(new ContentInfo(tmpStream.ToArray()),true);
+                SignedCms signedCms = new SignedCms(new ContentInfo(tmpDataEntityStream.ToArray()),true);
                 signedCms.Decode(((MIME_b_SinglepartBase)signatureEntity.Body).Data);
                 signedCms.CheckSignature(true);
 
@@ -115,6 +153,54 @@ namespace LumiSoft.Net.MIME
             catch{
                 return false;
             }
+        }
+
+        #endregion
+
+
+        #region method ToStream
+
+        /// <summary>
+        /// Stores MIME entity body to the specified stream.
+        /// </summary>
+        /// <param name="stream">Stream where to store body data.</param>
+        /// <param name="headerWordEncoder">Header 8-bit words ecnoder. Value null means that words are not encoded.</param>
+        /// <param name="headerParmetersCharset">Charset to use to encode 8-bit header parameters. Value null means parameters not encoded.</param>
+        /// <param name="headerReencode">If true always specified encoding is used for header. If false and header field value not modified, 
+        /// original encoding is kept.</param>
+        /// <exception cref="ArgumentNullException">Is raised when <b>stream</b> is null reference.</exception>
+        internal protected override void ToStream(Stream stream,MIME_Encoding_EncodedWord headerWordEncoder,Encoding headerParmetersCharset,bool headerReencode)
+        {
+            // We have signer certificate, sign this entity.
+            if(this.BodyParts.Count > 0 && m_pSignerCert != null){
+                // Remove old signature if there is any.
+                if(this.BodyParts.Count > 1){
+                    this.BodyParts.Remove(1);
+                }
+
+                // Store entity to tmp stream.
+                MemoryStream tmpDataEntityStream = new MemoryStream();
+                this.BodyParts[0].ToStream(tmpDataEntityStream,null,null,false);
+        
+                // Compute PKCS #7 message.
+                SignedCms signedCms = new SignedCms(new ContentInfo(tmpDataEntityStream.ToArray()),true);
+                signedCms.ComputeSignature(new CmsSigner(m_pSignerCert));
+                byte[] pkcs7 = signedCms.Encode();
+   
+                // Create PKCS 7 entity.
+                MIME_Entity entity_application_pkcs7 = new MIME_Entity();
+                MIME_b_Application application_pkcs7 = new MIME_b_Application(MIME_MediaTypes.Application.x_pkcs7_signature);
+                entity_application_pkcs7.Body = application_pkcs7;
+                application_pkcs7.SetData(new MemoryStream(pkcs7),MIME_TransferEncodings.Base64);
+                entity_application_pkcs7.ContentType.Param_Name = "smime.p7s";
+                entity_application_pkcs7.ContentDescription = "S/MIME Cryptographic Signature";
+                this.BodyParts.Add(entity_application_pkcs7);
+
+                signedCms.Decode(application_pkcs7.Data);
+                signedCms.CheckSignature(true);
+            }
+
+            base.ToStream(stream,headerWordEncoder,headerParmetersCharset,headerReencode);
         }
 
         #endregion
