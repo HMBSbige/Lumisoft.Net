@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
+using System.Security.Cryptography.X509Certificates;
 
 using LumiSoft.Net.IO;
 using LumiSoft.Net.MIME;
@@ -38,6 +39,242 @@ namespace LumiSoft.Net.Mail
             this.Header.FieldsProvider.HeaderFields.Add("Disposition-Notification-Options",typeof(Mail_h_DispositionNotificationOptions));
         }
 
+
+        #region static method Create
+
+        /// <summary>
+        /// Creates mail message.
+        /// </summary>
+        /// <param name="from">From: address.</param>
+        /// <param name="to">To: address.</param>
+        /// <param name="cc">Cc: address. Value null means not used.</param>
+        /// <param name="bcc">bcc: address. Value null means not used.</param>
+        /// <param name="subject">Message subject.</param>
+        /// <param name="text">Message body text.</param>
+        /// <param name="html">Message HTML text. Value null means not used.</param>
+        /// <param name="attachments">Message attachments. Value null means not used.</param>
+        /// <returns>Returns created mail message.</returns>
+        public static Mail_Message Create(Mail_t_Mailbox from,Mail_t_Address[] to,Mail_t_Address[] cc,Mail_t_Address[] bcc,string subject,string text,string html,Mail_t_Attachment[] attachments)
+        {
+            // Create header.
+            Mail_Message msg = new Mail_Message();
+            msg.MimeVersion = "1.0";
+            msg.MessageID = MIME_Utils.CreateMessageID();
+            msg.Date = DateTime.Now;
+            if(from != null){
+                msg.From = new Mail_t_MailboxList();
+                msg.From.Add(from);
+            }
+            if(to != null){
+                msg.To = new Mail_t_AddressList();
+                foreach(Mail_t_Address address in to){
+                    msg.To.Add(address);
+                }
+            }
+            msg.Subject = subject;
+
+            // Create message without attachments.
+            if(attachments == null || attachments.Length == 0){
+                // text/plain
+                if(string.IsNullOrEmpty(html)){
+                    MIME_b_Text text_plain = new MIME_b_Text(MIME_MediaTypes.Text.plain);
+                    msg.Body = text_plain;
+                    text_plain.SetText(MIME_TransferEncodings.QuotedPrintable,Encoding.UTF8,text);
+                }
+                // multipart/alternative
+                //  text/plain
+                //  text/html
+                else{
+                    MIME_b_MultipartAlternative multipartAlternative = new MIME_b_MultipartAlternative();
+                    msg.Body = multipartAlternative;
+                        multipartAlternative.BodyParts.Add(MIME_Entity.CreateEntity_Text_Plain(MIME_TransferEncodings.QuotedPrintable,Encoding.UTF8,text));
+                        multipartAlternative.BodyParts.Add(MIME_Entity.CreateEntity_Text_Html(MIME_TransferEncodings.QuotedPrintable,Encoding.UTF8,html));
+                }
+            }
+            // Create message with attachments.
+            else{                
+                // multipart/mixed
+                //  text/plain
+                //  application/octet-stream
+                if(string.IsNullOrEmpty(html)){
+                    MIME_b_MultipartMixed multipartMixed = new MIME_b_MultipartMixed();
+                    msg.Body = multipartMixed;
+                        multipartMixed.BodyParts.Add(MIME_Entity.CreateEntity_Text_Plain(MIME_TransferEncodings.QuotedPrintable,Encoding.UTF8,text));
+
+                        // Add attachments.
+                        foreach(Mail_t_Attachment attachment in attachments){
+                            try{
+                                multipartMixed.BodyParts.Add(MIME_Entity.CreateEntity_Attachment(attachment.Name,attachment.GetStream()));
+                            }
+                            finally{
+                                attachment.CloseStream();
+                            }
+                        }
+                }
+                // multipart/mixed
+                //  multipart/alternative
+                //   text/plain
+                //   text/html
+                //  application/octet-stream
+                else{
+                    MIME_b_MultipartMixed multipartMixed = new MIME_b_MultipartMixed();
+                    msg.Body = multipartMixed;
+                        MIME_Entity entity_multipart_alternative = new MIME_Entity();
+                        MIME_b_MultipartAlternative multipartAlternative = new MIME_b_MultipartAlternative();
+                        entity_multipart_alternative.Body = multipartAlternative;
+                        multipartMixed.BodyParts.Add(entity_multipart_alternative);
+                            multipartAlternative.BodyParts.Add(MIME_Entity.CreateEntity_Text_Plain(MIME_TransferEncodings.QuotedPrintable,Encoding.UTF8,text));
+                            multipartAlternative.BodyParts.Add(MIME_Entity.CreateEntity_Text_Html(MIME_TransferEncodings.QuotedPrintable,Encoding.UTF8,html));
+
+                        // Add attachments.
+                        foreach(Mail_t_Attachment attachment in attachments){
+                            try{
+                                multipartMixed.BodyParts.Add(MIME_Entity.CreateEntity_Attachment(attachment.Name,attachment.GetStream()));
+                            }
+                            finally{
+                                attachment.CloseStream();
+                            }
+                        }
+                }
+            }
+
+            return msg;
+        }
+
+        #endregion
+
+        #region static method Create_MultipartSigned
+
+        /// <summary>
+        /// Creates mail message.
+        /// </summary>
+        /// <param name="signerCert">Signer certificate,</param>
+        /// <param name="from">From: address.</param>
+        /// <param name="to">To: address.</param>
+        /// <param name="cc">Cc: address. Value null means not used.</param>
+        /// <param name="bcc">bcc: address. Value null means not used.</param>
+        /// <param name="subject">Message subject.</param>
+        /// <param name="text">Message body text.</param>
+        /// <param name="html">Message HTML text. Value null means not used.</param>
+        /// <param name="attachments">Message attachments. Value null means not used.</param>
+        /// <returns>Returns created mail message.</returns>
+        /// <exception cref="ArgumentNullException">Is raised when <b>signerCert</b> is null reference.</exception>
+        public static Mail_Message Create_MultipartSigned(X509Certificate2 signerCert,Mail_t_Mailbox from,Mail_t_Address[] to,Mail_t_Address[] cc,Mail_t_Address[] bcc,string subject,string text,string html,Mail_t_Attachment[] attachments)
+        {
+            if(signerCert == null){
+                throw new ArgumentNullException("signerCert");
+            }
+
+            // Create header.
+            Mail_Message msg = new Mail_Message();
+            msg.MimeVersion = "1.0";
+            msg.MessageID = MIME_Utils.CreateMessageID();
+            msg.Date = DateTime.Now;
+            if(from != null){
+                msg.From = new Mail_t_MailboxList();
+                msg.From.Add(from);
+            }
+            if(to != null){
+                msg.To = new Mail_t_AddressList();
+                foreach(Mail_t_Address address in to){
+                    msg.To.Add(address);
+                }
+            }
+            msg.Subject = subject;
+
+            // Create message without attachments.
+            if(attachments == null || attachments.Length == 0){
+                // multipart/signed
+                //  text/plain
+                //  application/pkcs7-signature  MIME library adds this when message saved out.
+                if(string.IsNullOrEmpty(html)){
+                    MIME_b_MultipartSigned multipartSigned = new MIME_b_MultipartSigned();
+                    msg.Body = multipartSigned;
+                    multipartSigned.SetCertificate(signerCert);
+                        multipartSigned.BodyParts.Add(MIME_Entity.CreateEntity_Text_Plain(MIME_TransferEncodings.QuotedPrintable,Encoding.UTF8,text));
+                }
+                // multipart/signed
+                //  multipart/alternative
+                //   text/plain
+                //   text/html
+                //  application/pkcs7-signature  MIME library adds this when message saved out.
+                else{
+                    MIME_b_MultipartSigned multipartSigned = new MIME_b_MultipartSigned();
+                    msg.Body = multipartSigned;
+                    multipartSigned.SetCertificate(signerCert);
+                        MIME_Entity entity_multipart_alternative = new MIME_Entity();
+                        MIME_b_MultipartAlternative multipartAlternative = new MIME_b_MultipartAlternative();
+                        entity_multipart_alternative.Body = multipartAlternative;
+                        multipartSigned.BodyParts.Add(entity_multipart_alternative);
+                            multipartAlternative.BodyParts.Add(MIME_Entity.CreateEntity_Text_Plain(MIME_TransferEncodings.QuotedPrintable,Encoding.UTF8,text));
+                            multipartAlternative.BodyParts.Add(MIME_Entity.CreateEntity_Text_Html(MIME_TransferEncodings.QuotedPrintable,Encoding.UTF8,html));
+                }                
+            }
+            // Create message with attachments.
+            else{
+                // multipart/signed
+                //  multipart/mixed
+                //   text/plain
+                //   application/octet-stream
+                //  application/pkcs7-signature  MIME library adds this when message saved out.
+                if(string.IsNullOrEmpty(html)){
+                    MIME_b_MultipartSigned multipartSigned = new MIME_b_MultipartSigned();
+                    msg.Body = multipartSigned;
+                    multipartSigned.SetCertificate(signerCert);
+                        MIME_Entity entity_multipart_mixed = new MIME_Entity();
+                        MIME_b_MultipartMixed multipartMixed = new MIME_b_MultipartMixed();
+                        entity_multipart_mixed.Body = multipartMixed;
+                        multipartSigned.BodyParts.Add(entity_multipart_mixed);
+                            multipartMixed.BodyParts.Add(MIME_Entity.CreateEntity_Text_Plain(MIME_TransferEncodings.QuotedPrintable,Encoding.UTF8,text));
+
+                            // Add attachments.
+                            foreach(Mail_t_Attachment attachment in attachments){
+                                try{
+                                    multipartMixed.BodyParts.Add(MIME_Entity.CreateEntity_Attachment(attachment.Name,attachment.GetStream()));
+                                }
+                                finally{
+                                    attachment.CloseStream();
+                                }
+                            }
+                }
+                // multipart/signed
+                //  multipart/mixed
+                //   multipart/alternative
+                //    text/plain
+                //    text/html
+                //   application/octet-stream
+                //  application/pkcs7-signature  MIME library adds this when message saved out.
+                else{
+                    MIME_b_MultipartSigned multipartSigned = new MIME_b_MultipartSigned();
+                    msg.Body = multipartSigned;
+                    multipartSigned.SetCertificate(signerCert);
+                        MIME_Entity entity_multipart_mixed = new MIME_Entity();
+                        MIME_b_MultipartMixed multipartMixed = new MIME_b_MultipartMixed();
+                        entity_multipart_mixed.Body = multipartMixed;
+                        multipartSigned.BodyParts.Add(entity_multipart_mixed);
+                            MIME_Entity entity_multipart_alternative = new MIME_Entity();
+                            MIME_b_MultipartAlternative multipartAlternative = new MIME_b_MultipartAlternative();
+                            entity_multipart_alternative.Body = multipartAlternative;
+                            multipartMixed.BodyParts.Add(entity_multipart_alternative);
+                                multipartAlternative.BodyParts.Add(MIME_Entity.CreateEntity_Text_Plain(MIME_TransferEncodings.QuotedPrintable,Encoding.UTF8,text));
+                                multipartAlternative.BodyParts.Add(MIME_Entity.CreateEntity_Text_Html(MIME_TransferEncodings.QuotedPrintable,Encoding.UTF8,html));
+
+                            // Add attachments.
+                            foreach(Mail_t_Attachment attachment in attachments){
+                                try{
+                                    multipartMixed.BodyParts.Add(MIME_Entity.CreateEntity_Attachment(attachment.Name,attachment.GetStream()));
+                                }
+                                finally{
+                                    attachment.CloseStream();
+                                }
+                            }
+                }                
+            }
+
+            return msg;
+        }
+
+        #endregion
 
         #region static method ParseFromByte
 
