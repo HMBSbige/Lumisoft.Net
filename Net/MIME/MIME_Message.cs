@@ -113,75 +113,6 @@ namespace LumiSoft.Net.MIME
 
         #endregion
 
-        #region static method CreateAttachment
-
-        /// <summary>
-        /// Creates attachment entity.
-        /// </summary>
-        /// <param name="file">File name with optional path.</param>
-        /// <returns>Returns created attachment entity.</returns>
-        /// <exception cref="ArgumentNullException">Is raised when <b>file</b> is null reference.</exception>
-        public static MIME_Entity CreateAttachment(string file)
-        {
-            if(file == null){
-                throw new ArgumentNullException("file");
-            }
-
-            MIME_Entity retVal = new MIME_Entity();
-            MIME_b_Application body = new MIME_b_Application(MIME_MediaTypes.Application.octet_stream);
-            retVal.Body = body;
-            body.SetDataFromFile(file,MIME_TransferEncodings.Base64);
-            retVal.ContentType.Param_Name = Path.GetFileName(file);
-
-            FileInfo fileInfo = new FileInfo(file);
-            MIME_h_ContentDisposition disposition = new MIME_h_ContentDisposition(MIME_DispositionTypes.Attachment);
-            disposition.Param_FileName         = Path.GetFileName(file);
-            disposition.Param_Size             = fileInfo.Length;
-            disposition.Param_CreationDate     = fileInfo.CreationTime;
-            disposition.Param_ModificationDate = fileInfo.LastWriteTime;
-            disposition.Param_ReadDate         = fileInfo.LastAccessTime;
-            retVal.ContentDisposition = disposition;
-            
-            return retVal;
-        }
-
-        /// <summary>
-        /// Creates attachment entity.
-        /// </summary>
-        /// <param name="stream">Attachment data stream. Data is read from stream current position.</param>
-        /// <param name="fileName">File name.</param>
-        /// <returns>Returns created attachment entity.</returns>
-        /// <exception cref="ArgumentNullException">Is raised when <b>stream</b> or <b>fileName</b> is null reference.</exception>
-        public static MIME_Entity CreateAttachment(Stream stream,string fileName)
-        {
-            if(stream == null){
-                throw new ArgumentNullException("stream");
-            }
-            if(fileName == null){
-                throw new ArgumentNullException("fileName");
-            }
-
-            long fileSize = stream.CanSeek ? (stream.Length - stream.Position) : -1;
-
-            MIME_Entity retVal = new MIME_Entity();
-            MIME_b_Application body = new MIME_b_Application(MIME_MediaTypes.Application.octet_stream);
-            retVal.Body = body;
-            body.SetData(stream,MIME_TransferEncodings.Base64);
-            retVal.ContentType.Param_Name = Path.GetFileName(fileName);
-
-            MIME_h_ContentDisposition disposition = new MIME_h_ContentDisposition(MIME_DispositionTypes.Attachment);
-            disposition.Param_FileName         = Path.GetFileName(fileName);
-            disposition.Param_Size             = fileSize;
-            //disposition.Param_CreationDate     = fileInfo.CreationTime;
-            //disposition.Param_ModificationDate = fileInfo.LastWriteTime;
-            //disposition.Param_ReadDate         = fileInfo.LastAccessTime;
-            retVal.ContentDisposition = disposition;
-
-            return retVal;
-        }
-
-        #endregion
-
 
         #region method GetAllEntities
 
@@ -329,6 +260,80 @@ namespace LumiSoft.Net.MIME
 
                 return retVal.ToArray();
             }
+        }
+
+        #endregion
+
+
+        // --- Obsolete stuff --------
+
+        #region static method CreateAttachment
+
+        /// <summary>
+        /// Creates attachment entity.
+        /// </summary>
+        /// <param name="file">File name with optional path.</param>
+        /// <returns>Returns created attachment entity.</returns>
+        /// <exception cref="ArgumentNullException">Is raised when <b>file</b> is null reference.</exception>
+        [Obsolete("Use MIME_Entity.CreateEntity_Attachment instead.")]
+        public static MIME_Entity CreateAttachment(string file)
+        {
+            if(file == null){
+                throw new ArgumentNullException("file");
+            }
+
+            MIME_Entity retVal = new MIME_Entity();
+            MIME_b_Application body = new MIME_b_Application(MIME_MediaTypes.Application.octet_stream);
+            retVal.Body = body;
+            body.SetDataFromFile(file,MIME_TransferEncodings.Base64);
+            retVal.ContentType.Param_Name = Path.GetFileName(file);
+
+            FileInfo fileInfo = new FileInfo(file);
+            MIME_h_ContentDisposition disposition = new MIME_h_ContentDisposition(MIME_DispositionTypes.Attachment);
+            disposition.Param_FileName         = Path.GetFileName(file);
+            disposition.Param_Size             = fileInfo.Length;
+            disposition.Param_CreationDate     = fileInfo.CreationTime;
+            disposition.Param_ModificationDate = fileInfo.LastWriteTime;
+            disposition.Param_ReadDate         = fileInfo.LastAccessTime;
+            retVal.ContentDisposition = disposition;
+            
+            return retVal;
+        }
+
+        /// <summary>
+        /// Creates attachment entity.
+        /// </summary>
+        /// <param name="stream">Attachment data stream. Data is read from stream current position.</param>
+        /// <param name="fileName">File name.</param>
+        /// <returns>Returns created attachment entity.</returns>
+        /// <exception cref="ArgumentNullException">Is raised when <b>stream</b> or <b>fileName</b> is null reference.</exception>        
+        [Obsolete("Use MIME_Entity.CreateEntity_Attachment instead.")]
+        public static MIME_Entity CreateAttachment(Stream stream,string fileName)
+        {
+            if(stream == null){
+                throw new ArgumentNullException("stream");
+            }
+            if(fileName == null){
+                throw new ArgumentNullException("fileName");
+            }
+
+            long fileSize = stream.CanSeek ? (stream.Length - stream.Position) : -1;
+
+            MIME_Entity retVal = new MIME_Entity();
+            MIME_b_Application body = new MIME_b_Application(MIME_MediaTypes.Application.octet_stream);
+            retVal.Body = body;
+            body.SetData(stream,MIME_TransferEncodings.Base64);
+            retVal.ContentType.Param_Name = Path.GetFileName(fileName);
+
+            MIME_h_ContentDisposition disposition = new MIME_h_ContentDisposition(MIME_DispositionTypes.Attachment);
+            disposition.Param_FileName         = Path.GetFileName(fileName);
+            disposition.Param_Size             = fileSize;
+            //disposition.Param_CreationDate     = fileInfo.CreationTime;
+            //disposition.Param_ModificationDate = fileInfo.LastWriteTime;
+            //disposition.Param_ReadDate         = fileInfo.LastAccessTime;
+            retVal.ContentDisposition = disposition;
+
+            return retVal;
         }
 
         #endregion
