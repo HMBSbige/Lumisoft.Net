@@ -550,7 +550,6 @@ namespace LumiSoft.Net.MIME
 
         #endregion
 
-        private MIME_h_ContentType    m_pContentType = null;
         private MIME_EntityCollection m_pBodyParts   = null;
         private string                m_TextPreamble = "";
         private string                m_TextEpilogue = "";
@@ -569,8 +568,6 @@ namespace LumiSoft.Net.MIME
             if(string.IsNullOrEmpty(contentType.Param_Boundary)){
                 throw new ArgumentException("Argument 'contentType' doesn't contain required boundary parameter.");
             }
-
-            m_pContentType = contentType;
 
             m_pBodyParts = new MIME_EntityCollection();
         }               
@@ -677,7 +674,7 @@ namespace LumiSoft.Net.MIME
 
             // Owner entity has no content-type or has different content-type, just add/overwrite it.
             if(setContentType && (this.Entity.ContentType == null || !string.Equals(this.Entity.ContentType.TypeWithSubtype,this.MediaType,StringComparison.InvariantCultureIgnoreCase))){
-                this.Entity.ContentType = m_pContentType;
+                this.Entity.ContentType = this.ContentType;
             }
         }
 
