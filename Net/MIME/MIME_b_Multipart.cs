@@ -573,6 +573,14 @@ namespace LumiSoft.Net.MIME
             m_pContentType = contentType;
 
             m_pBodyParts = new MIME_EntityCollection();
+        }               
+
+        /// <summary>
+        /// Internal constructor. No Content-Type is created, user must do it manually.
+        /// </summary>
+        internal MIME_b_Multipart() 
+        {
+            m_pBodyParts = new MIME_EntityCollection();
         }
 
 
