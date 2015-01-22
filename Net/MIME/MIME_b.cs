@@ -28,6 +28,13 @@ namespace LumiSoft.Net.MIME
             }
 
             m_pContentType = contentType;
+        }                       
+
+        /// <summary>
+        /// Internal constructor. No Content-Type is created, user must do it manually.
+        /// </summary>
+        internal MIME_b()
+        {
         }
 
 
@@ -119,6 +126,17 @@ namespace LumiSoft.Net.MIME
         public string MediaType
         {
             get{ return m_pContentType.TypeWithSubtype; }
+        }
+
+
+        /// <summary>
+        /// Gets content-type.
+        /// </summary>
+        internal MIME_h_ContentType ContentType
+        {
+            get{ return m_pContentType; }
+
+            set{ m_pContentType = value; }
         }
 
         #endregion
