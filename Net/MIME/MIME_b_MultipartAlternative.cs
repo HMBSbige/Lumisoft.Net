@@ -18,6 +18,16 @@ namespace LumiSoft.Net.MIME
     public class MIME_b_MultipartAlternative : MIME_b_Multipart
     {
         /// <summary>
+        /// Default constructor. The boundary = auto-generated.
+        /// </summary>
+        public MIME_b_MultipartAlternative() : base()
+        {
+            MIME_h_ContentType contentType_multipartAlternative = new MIME_h_ContentType(MIME_MediaTypes.Multipart.alternative);
+            contentType_multipartAlternative.Param_Boundary = Guid.NewGuid().ToString().Replace('-','.');
+            this.ContentType = contentType_multipartAlternative;
+        }
+
+        /// <summary>
         /// Default constructor.
         /// </summary>
         /// <param name="contentType">Content type.</param>
