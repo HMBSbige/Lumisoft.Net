@@ -120,21 +120,35 @@ namespace LumiSoft.Net.MIME
         /// <summary>
         /// Creates attachment(application/octet-stream) entity.
         /// </summary>
-        /// <param name="attachmentName">Attachment file name what appears in mail message.</param>
         /// <param name="fileName">File name with path.</param>
         /// <returns>Returns created entity.</returns>
-        /// <exception cref="ArgumentNullException">Is raised when <b>attachmentName</b> or <b>fileName</b> is null reference.</exception>
-        public static MIME_Entity CreateEntity_Attachment(string attachmentName,string fileName)
+        /// <exception cref="ArgumentNullException">Is raised when <b>fileName</b> is null reference.</exception>
+        public static MIME_Entity CreateEntity_Attachment(string fileName)
         {
-            if(attachmentName == null){
-                throw new ArgumentNullException("attachmentName");
-            }
             if(fileName == null){
                 throw new ArgumentNullException("stream");
             }
 
             using(Stream stream = File.OpenRead(fileName)){
-                return CreateEntity_Attachment(attachmentName,stream);
+                return CreateEntity_Attachment(Path.GetFileName(fileName),stream);
+            }
+        }
+
+        /// <summary>
+        /// Creates attachment(application/octet-stream) entity.
+        /// </summary>
+        /// <param name="attachmentName">Attachment file name what appears in mail message. Value null means argument 'fileName' file name is used.</param>
+        /// <param name="fileName">File name with path.</param>
+        /// <returns>Returns created entity.</returns>
+        /// <exception cref="ArgumentNullException">Is raised when <b>fileName</b> is null reference.</exception>
+        public static MIME_Entity CreateEntity_Attachment(string attachmentName,string fileName)
+        {
+            if(fileName == null){
+                throw new ArgumentNullException("stream");
+            }
+
+            using(Stream stream = File.OpenRead(fileName)){
+                return CreateEntity_Attachment(string.IsNullOrEmpty(attachmentName) ? Path.GetFileName(fileName) : attachmentName,stream);
             }
         }
 
