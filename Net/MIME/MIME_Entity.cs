@@ -49,6 +49,133 @@ namespace LumiSoft.Net.MIME
         #endregion
 
 
+        #region static method CreateEntity_Text_Plain
+
+        /// <summary>
+        /// Creates text/plain MIME entity.
+        /// </summary>
+        /// <param name="transferEncoding">Content transfer encoding.</param>
+        /// <param name="charset">Charset to use to encode text. If not sure, utf-8 is recommended.</param>
+        /// <param name="text">Text.</param>
+        /// <returns>Returns created entity.</returns>
+        /// <exception cref="ArgumentNullException">Is raised when <b>transferEncoding</b>, <b>charset</b> or <b>text</b> is null reference.</exception>
+        /// <exception cref="NotSupportedException">Is raised when body contains not supported Content-Transfer-Encoding.</exception>
+        public static MIME_Entity CreateEntity_Text_Plain(string transferEncoding,Encoding charset,string text)
+        {
+            if(transferEncoding == null){
+                throw new ArgumentNullException("transferEncoding");
+            }
+            if(charset == null){
+                throw new ArgumentNullException("charset");
+            }
+            if(text == null){
+                throw new ArgumentNullException("text");
+            }
+
+            MIME_Entity retVal = new MIME_Entity();
+            MIME_b_Text body = new MIME_b_Text(MIME_MediaTypes.Text.plain);
+            retVal.Body = body;
+            body.SetText(transferEncoding,charset,text);
+
+            return retVal;
+        }
+
+        #endregion
+
+        #region static method CreateEntity_Text_Html
+
+        /// <summary>
+        /// Creates text/html MIME entity.
+        /// </summary>
+        /// <param name="transferEncoding">Content transfer encoding.</param>
+        /// <param name="charset">Charset to use to encode text. If not sure, utf-8 is recommended.</param>
+        /// <param name="text">Text.</param>
+        /// <returns>Returns created entity.</returns>
+        /// <exception cref="ArgumentNullException">Is raised when <b>transferEncoding</b>, <b>charset</b> or <b>text</b> is null reference.</exception>
+        /// <exception cref="NotSupportedException">Is raised when body contains not supported Content-Transfer-Encoding.</exception>
+        public static MIME_Entity CreateEntity_Text_Html(string transferEncoding,Encoding charset,string text)
+        {
+            if(transferEncoding == null){
+                throw new ArgumentNullException("transferEncoding");
+            }
+            if(charset == null){
+                throw new ArgumentNullException("charset");
+            }
+            if(text == null){
+                throw new ArgumentNullException("text");
+            }
+
+            MIME_Entity retVal = new MIME_Entity();
+            MIME_b_Text body = new MIME_b_Text(MIME_MediaTypes.Text.html);
+            retVal.Body = body;
+            body.SetText(transferEncoding,charset,text);
+
+            return retVal;
+        }
+
+        #endregion
+
+        #region static method CreateEntity_Attachment
+
+        /// <summary>
+        /// Creates attachment(application/octet-stream) entity.
+        /// </summary>
+        /// <param name="attachmentName">Attachment file name what appears in mail message.</param>
+        /// <param name="fileName">File name with path.</param>
+        /// <returns>Returns created entity.</returns>
+        /// <exception cref="ArgumentNullException">Is raised when <b>attachmentName</b> or <b>fileName</b> is null reference.</exception>
+        public static MIME_Entity CreateEntity_Attachment(string attachmentName,string fileName)
+        {
+            if(attachmentName == null){
+                throw new ArgumentNullException("attachmentName");
+            }
+            if(fileName == null){
+                throw new ArgumentNullException("stream");
+            }
+
+            using(Stream stream = File.OpenRead(fileName)){
+                return CreateEntity_Attachment(attachmentName,stream);
+            }
+        }
+
+        /// <summary>
+        /// Creates attachment(application/octet-stream) entity.
+        /// </summary>
+        /// <param name="attachmentName">Attachment file name what appears in mail message.</param>
+        /// <param name="stream">Attachment data stream. Data is read from stream current position.</param>
+        /// <returns>Returns created entity.</returns>
+        /// <exception cref="ArgumentNullException">Is raised when <b>attachmentName</b> or <b>stream</b> is null reference.</exception>
+        public static MIME_Entity CreateEntity_Attachment(string attachmentName,Stream stream)
+        {
+            if(attachmentName == null){
+                throw new ArgumentNullException("attachmentName");
+            }
+            if(stream == null){
+                throw new ArgumentNullException("stream");
+            }
+
+            long fileSize = stream.CanSeek ? (stream.Length - stream.Position) : -1;
+
+            MIME_Entity retVal = new MIME_Entity();
+            MIME_b_Application body = new MIME_b_Application(MIME_MediaTypes.Application.octet_stream);
+            retVal.Body = body;
+            body.SetData(stream,MIME_TransferEncodings.Base64);
+            retVal.ContentType.Param_Name = Path.GetFileName(attachmentName);
+
+            MIME_h_ContentDisposition disposition = new MIME_h_ContentDisposition(MIME_DispositionTypes.Attachment);
+            disposition.Param_FileName           = Path.GetFileName(attachmentName);
+            disposition.Param_Size               = fileSize;
+            //disposition.Param_CreationDate     = fileInfo.CreationTime;
+            //disposition.Param_ModificationDate = fileInfo.LastWriteTime;
+            //disposition.Param_ReadDate         = fileInfo.LastAccessTime;
+            retVal.ContentDisposition = disposition;
+
+            return retVal;
+        }
+
+        #endregion
+
+
         #region method ToFile
 
         /// <summary>
