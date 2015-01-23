@@ -114,6 +114,60 @@ namespace LumiSoft.Net.MIME
         #endregion
 
 
+        #region method ToFile
+
+        /// <summary>
+        /// Stores message to the specified file.
+        /// </summary>
+        /// <exception cref="ArgumentNullException">Is raised when <b>file</b> is null.</exception>
+        /// <exception cref="ArgumentException">Is raised when any of the arguments has invalid value.</exception>
+        public void ToFile(string file)
+        {
+            ToFile(file,new MIME_Encoding_EncodedWord(MIME_EncodedWordEncoding.B,Encoding.UTF8),Encoding.UTF8);
+        }
+
+        #endregion
+
+        #region method ToStream
+
+        /// <summary>
+        /// Store message to the specified stream.
+        /// </summary>
+        /// <param name="stream">Stream where to store MIME entity. Storing starts form stream current position.</param>
+        /// <exception cref="ArgumentNullException">Is raised when <b>stream</b> is null.</exception>
+        public void ToStream(Stream stream)
+        {
+            ToStream(stream,new MIME_Encoding_EncodedWord(MIME_EncodedWordEncoding.B,Encoding.UTF8),Encoding.UTF8);
+        }
+
+        #endregion
+
+        #region method ToString
+
+        /// <summary>
+        /// Returns message as string.
+        /// </summary>
+        /// <returns>Returns message as string.</returns>
+        public override string ToString()
+        {
+            return ToString(new MIME_Encoding_EncodedWord(MIME_EncodedWordEncoding.B,Encoding.UTF8),Encoding.UTF8);
+        }
+
+        #endregion
+
+        #region method ToByte
+
+        /// <summary>
+        /// Returns message as byte[].
+        /// </summary>
+        /// <returns>Returns message as byte[].</returns>
+        public byte[] ToByte()
+        {
+            return ToByte(new MIME_Encoding_EncodedWord(MIME_EncodedWordEncoding.B,Encoding.UTF8),Encoding.UTF8);
+        }
+
+        #endregion
+
         #region method GetAllEntities
 
         /// <summary>
@@ -222,6 +276,25 @@ namespace LumiSoft.Net.MIME
 
 
         #region Properties Implementation
+
+        /// <summary>
+        /// Gets if message contains signed data.
+        /// </summary>
+        public bool IsSigned
+        {
+            get{
+                foreach(MIME_Entity entity in this.AllEntities){
+                    if(string.Equals(entity.ContentType.TypeWithSubtype,MIME_MediaTypes.Application.pkcs7_mime,StringComparison.InvariantCultureIgnoreCase)){
+                        return true;
+                    }
+                    else if(string.Equals(entity.ContentType.TypeWithSubtype,MIME_MediaTypes.Multipart.signed,StringComparison.InvariantCultureIgnoreCase)){
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
 
         /// <summary>
         /// Gets all MIME entities as list.
