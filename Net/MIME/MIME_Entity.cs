@@ -347,7 +347,7 @@ namespace LumiSoft.Net.MIME
         /// </summary>
         /// <param name="stream">Stream where to store body data.</param>
         /// <exception cref="ArgumentNullException">Is raised when <b>stream</b> is null reference.</exception>
-        /// <exception cref="ArgumentNullException">Is raised when this method is called for multipart entity.</exception>
+        /// <exception cref="InvalidOperationException">Is raised when this method is called for multipart entity.</exception>
         public void DataToStream(Stream stream)
         {
             if(stream == null){
@@ -376,7 +376,7 @@ namespace LumiSoft.Net.MIME
         /// <param name="fileName">File name with path, where to store body data.</param>
         /// <exception cref="ArgumentNullException">Is raised when <b>fileName</b> is null reference.</exception>
         /// <exception cref="ArgumentException">Is raised when any of the arguments has invalid value.</exception>
-        /// <exception cref="ArgumentNullException">Is raised when this method is called for multipart entity.</exception>
+        /// <exception cref="InvalidOperationException">Is raised when this method is called for multipart entity.</exception>
         public void DataToFile(string fileName)
         {
             if(fileName == null){
@@ -398,6 +398,33 @@ namespace LumiSoft.Net.MIME
                     Net_Utils.StreamCopy(dataStream,fs,64000);
                 }
             }
+        }
+
+        #endregion
+
+        #region method DataToByte
+
+        /// <summary>
+        /// Returns body data as byte[]. Note: This method is available for single part entities only.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Is raised when this method is called for multipart entity.</exception>
+        /// <returns>Returns body data as byte[].</returns>
+        public byte[] DataToByte()
+        {
+            if(this.Body == null){
+                throw new InvalidOperationException("Mime entity body has been not set yet.");
+            }
+            if(!(this.Body is MIME_b_SinglepartBase)){
+                throw new InvalidOperationException("This method is available only for single part entities, not for multipart.");
+            }
+
+            MemoryStream stream = new MemoryStream();
+            MIME_b_SinglepartBase body = (MIME_b_SinglepartBase)this.Body;
+            using(Stream dataStream = body.GetDataStream()){
+                Net_Utils.StreamCopy(dataStream,stream,64000);
+            }
+
+            return stream.ToArray();
         }
 
         #endregion
