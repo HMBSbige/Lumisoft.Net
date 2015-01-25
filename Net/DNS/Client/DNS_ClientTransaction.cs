@@ -151,6 +151,16 @@ namespace LumiSoft.Net.DNS.Client
                     m_pTimeoutTimer.Start();
                 }
                 catch{
+                    // Check if we have bad unicode qname.
+                    try{
+                        System.Globalization.IdnMapping ldn = new System.Globalization.IdnMapping();
+                        ldn.GetAscii(m_QName);
+                    }
+                    catch{
+                        m_pResponse = new DnsServerResponse(true,m_ID,DNS_RCode.NAME_ERROR,new List<DNS_rr>(),new List<DNS_rr>(),new List<DNS_rr>());
+                    }
+
+                    SetState(DNS_ClientTransactionState.Completed);
                     Dispose();
                 }
             });
