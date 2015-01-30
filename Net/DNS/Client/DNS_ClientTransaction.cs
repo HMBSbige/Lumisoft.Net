@@ -65,8 +65,10 @@ namespace LumiSoft.Net.DNS.Client
 
                 SetState(DNS_ClientTransactionState.Disposed);
 
-                m_pTimeoutTimer.Dispose();
-                m_pTimeoutTimer = null;
+                if(m_pTimeoutTimer != null){
+                    m_pTimeoutTimer.Dispose();
+                    m_pTimeoutTimer = null;
+                }
 
                 m_pOwner = null;
 
@@ -161,7 +163,6 @@ namespace LumiSoft.Net.DNS.Client
                     }
 
                     SetState(DNS_ClientTransactionState.Completed);
-                    Dispose();
                 }
             });
         }
@@ -221,6 +222,10 @@ namespace LumiSoft.Net.DNS.Client
         /// <param name="state">New transaction state.</param>
         private void SetState(DNS_ClientTransactionState state)
         {
+            if(this.State == DNS_ClientTransactionState.Disposed){
+                return;
+            }
+
             m_State = state;
 
             OnStateChanged();
