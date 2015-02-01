@@ -152,6 +152,9 @@
     <None Include="IMAP\IMAP_t_Capabilities.cs" />
     <Compile Include="IMAP\IMAP_r_u_Bye.cs" />
     <Compile Include="IMAP\IMAP_Search_Key_All.cs" />
+    <Compile Include="IMAP\IMAP_t_Fetch_r_i_BodyStructure_e.cs" />
+    <Compile Include="IMAP\IMAP_t_Fetch_r_i_BodyStructure_e_Multipart.cs" />
+    <Compile Include="IMAP\IMAP_t_Fetch_r_i_BodyStructure_e_SinglePart.cs" />
     <Compile Include="IMAP\IMAP_t_orc.cs" />
     <Compile Include="IMAP\IMAP_t_orc_Alert.cs" />
     <Compile Include="IMAP\IMAP_t_orc_AppendUid.cs" />

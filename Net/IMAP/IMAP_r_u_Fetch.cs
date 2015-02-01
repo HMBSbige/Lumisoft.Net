@@ -290,7 +290,34 @@ namespace LumiSoft.Net.IMAP
                 #region BODY
 
                 else if(r.StartsWith("BODY ",false)){
-                    //IMAP_t_Fetch_r_i_BodyS
+                    // BODYSTRUCTURE can contain string literals, we just try to parse it.
+                    // If parse fails, just get string literal and try again as long as all BODYSTRUCTURE data has read.
+                                        
+                    string bodyStructure = null;
+                    while(true){ 
+                        // Create temporary reader(we don't want to read partial BODYSTRUCTURE data from reader).
+                        StringReader tmpReader = new StringReader(r.SourceString);
+
+                        // Eat BODYSTRUCTURE word.
+                        tmpReader.ReadWord();
+                        tmpReader.ReadToFirstChar();
+
+                        try{
+                            bodyStructure = tmpReader.ReadParenthesized();
+                            // We got full BODYSTRUCTURE, so use tmp reader as reader.
+                            r = tmpReader;
+                                                        
+                            break;
+                        }
+                        catch{                            
+                            // Read completed async, it will continue parsing.
+                            if(ReadStringLiteral(imap,r,callback)){
+                                return;
+                            }
+                        }                       
+                    }
+
+                    m_pDataItems.Add(IMAP_t_Fetch_r_i_BodyStructure.Parse(new StringReader(bodyStructure)));
                 }
 
                 #endregion
@@ -298,7 +325,34 @@ namespace LumiSoft.Net.IMAP
                 #region BODYSTRUCTURE
 
                 else if(r.StartsWith("BODYSTRUCTURE",false)){
-                    //IMAP_t_Fetch_r_i_BodyStructure
+                    // BODYSTRUCTURE can contain string literals, we just try to parse it.
+                    // If parse fails, just get string literal and try again as long as all BODYSTRUCTURE data has read.
+                                        
+                    string bodyStructure = null;
+                    while(true){ 
+                        // Create temporary reader(we don't want to read partial BODYSTRUCTURE data from reader).
+                        StringReader tmpReader = new StringReader(r.SourceString);
+
+                        // Eat BODYSTRUCTURE word.
+                        tmpReader.ReadWord();
+                        tmpReader.ReadToFirstChar();
+
+                        try{
+                            bodyStructure = tmpReader.ReadParenthesized();
+                            // We got full BODYSTRUCTURE, so use tmp reader as reader.
+                            r = tmpReader;
+                                                        
+                            break;
+                        }
+                        catch{                            
+                            // Read completed async, it will continue parsing.
+                            if(ReadStringLiteral(imap,r,callback)){
+                                return;
+                            }
+                        }                       
+                    }
+
+                    m_pDataItems.Add(IMAP_t_Fetch_r_i_BodyStructure.Parse(new StringReader(bodyStructure)));
                 }
 
                 #endregion
@@ -876,7 +930,13 @@ namespace LumiSoft.Net.IMAP
             }
         }
         
-        // BODYSTRUCTURE
+        /// <summary>
+        /// Gets BODYSTRUCTURE value. Returns null if fetch response doesn't contain specified data-item.
+        /// </summary>
+        public IMAP_t_Fetch_r_i_BodyStructure BodyStructure
+        {
+            get{ return (IMAP_t_Fetch_r_i_BodyStructure)FilterDataItem(typeof(IMAP_t_Fetch_r_i_BodyStructure)); }
+        }
 
         /// <summary>
         /// Gets ENVELOPE value. Returns null if fetch response doesn't contain specified data-item.
