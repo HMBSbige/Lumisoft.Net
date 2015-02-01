@@ -611,12 +611,12 @@ namespace LumiSoft.Net.IMAP
         #region static method ReadString
 
         /// <summary>
-        /// Reads IMAP string/astring/nstring/utf8-quoted from string reader.
+        /// Reads IMAP string-literal/string/astring/nstring/utf8-quoted from string reader.
         /// </summary>
         /// <param name="reader">String reader.</param>
         /// <returns>Returns IMAP string.</returns>
         /// <exception cref="ArgumentNullException">Is raised when <b>reader</b> is null reference.</exception>
-        internal static string ReadString(StringReader reader)
+        public static string ReadString(StringReader reader)
         {
             if(reader == null){
                 throw new ArgumentNullException("reader");
@@ -624,8 +624,16 @@ namespace LumiSoft.Net.IMAP
 
             reader.ReadToFirstChar();
 
+            // We have string-literal.
+            if(reader.SourceString.StartsWith("{")){
+                int literalSize = Convert.ToInt32(reader.ReadParenthesized());
+                // Literal has CRLF ending, skip it.
+                reader.ReadSpecifiedLength(2);
+                                                
+                return reader.ReadSpecifiedLength(literalSize);
+            }
             // utf8-quoted
-            if(reader.StartsWith("*\"")){
+            else if(reader.StartsWith("*\"")){
                 reader.ReadSpecifiedLength(1);
 
                 return reader.ReadWord();
