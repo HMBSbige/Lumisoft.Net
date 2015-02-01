@@ -48,7 +48,7 @@ namespace LumiSoft.Net.Mime.vCard
              
                 Any COMMA or SEMICOLON in a text type value must be backslash escaped.
             */
-
+            
             if(NeedEncode(value)){
                 // Remove encoding and charset parameters
                 string newParmString = "";
@@ -108,9 +108,9 @@ namespace LumiSoft.Net.Mime.vCard
                 return true;
             }
 
-            // Allow only prontable chars and whitespaces.
+            // Allow only printable chars and whitespaces.
             foreach(char c in value){
-                if(!(char.IsLetterOrDigit(c) || char.IsWhiteSpace(c))){
+                if(char.IsControl(c)){
                     return true;
                 }
             }
