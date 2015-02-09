@@ -54,7 +54,9 @@ namespace LumiSoft.Net.IMAP
             List<int> values = new List<int>();
             if(response.Split(' ').Length > 2){
                 foreach(string value in response.Split(new char[]{' '},3)[2].Trim().Split(' ')){
-                    values.Add(Convert.ToInt32(value));
+                    if(!string.IsNullOrEmpty(value)){
+                        values.Add(Convert.ToInt32(value));
+                    }
                 }
             }
 
