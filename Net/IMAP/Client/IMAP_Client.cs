@@ -6812,7 +6812,7 @@ namespace LumiSoft.Net.IMAP.Client
                     }
                     // Command part is string value.
                     else{
-                        // NOTE: If charset specified, we ma not use IMAP utf-8 syntax and must use "literal" for non ASCII values.
+                        // NOTE: If charset specified, we may not use IMAP utf-8 syntax and must use "literal" with specified charset for non ASCII values.
 
                         // We need to use string as IMAP literal.
                         if(IMAP_Utils.MustUseLiteralString(cmdPart.Value,(m_pCharset == null && imap.m_MailboxEncoding == IMAP_Mailbox_Encoding.ImapUtf8))){

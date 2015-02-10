@@ -431,17 +431,16 @@ namespace LumiSoft.Net.IMAP
                 throw new ArgumentNullException("mailbox");
             }
 
-            /* RFC 5738 3.
-                string        =/ utf8-quoted
-                utf8-quoted   = "*" DQUOTE *UQUOTED-CHAR DQUOTE
-                UQUOTED-CHAR  = QUOTED-CHAR / UTF8-2 / UTF8-3 / UTF8-4
+            /* RFC 6855 3.
+                quoted        = DQUOTE *uQUOTED-CHAR DQUOTE
+                uQUOTED-CHAR  = QUOTED-CHAR / UTF8-2 / UTF8-3 / UTF8-4
             */
 
             if(encoding == IMAP_Mailbox_Encoding.ImapUtf7){
                 return "\"" + IMAP_Utils.Encode_IMAP_UTF7_String(mailbox) + "\"";
             }
             else if(encoding == IMAP_Mailbox_Encoding.ImapUtf8){
-                return "*\"" + mailbox + "\"";
+                return "\"" + mailbox + "\"";
             }
             else{
                 return "\"" + mailbox + "\"";
@@ -632,7 +631,7 @@ namespace LumiSoft.Net.IMAP
                                                 
                 return reader.ReadSpecifiedLength(literalSize);
             }
-            // utf8-quoted
+            // utf8-quoted old rfc 5738
             else if(reader.StartsWith("*\"")){
                 reader.ReadSpecifiedLength(1);
 
