@@ -37,6 +37,47 @@ namespace LumiSoft.Net.IMAP.Client
 	/// </example>
     public class IMAP_Client : TCP_Client
     {
+        #region class Settings
+
+        /// <summary>
+        /// This class represents IMAP client settings.
+        /// </summary>
+        public class SettingsHolder
+        {
+            private int m_ResponseLineSize = 512000;
+
+            /// <summary>
+            /// Default constructor.
+            /// </summary>
+            internal SettingsHolder()
+            {
+            }
+
+
+            #region Properties implementation
+
+            /// <summary>
+            /// Gets or sets maximum allowed IMAP server response line in bytes.
+            /// </summary>
+            /// <exception cref="ArgumentException">Is raised when value less than 32000(32kb) is set.</exception>
+            public int ResponseLineSize
+            {
+                get{ return m_ResponseLineSize; }
+
+                set{
+                    if(value < 32000){
+                        throw new ArgumentException("Value must be >= 32000(32kb).","value");
+                    }
+
+                    m_ResponseLineSize = value;
+                }
+            }
+
+            #endregion
+        }
+
+        #endregion
+
         #region class CmdLine
 
         /// <summary>
@@ -358,12 +399,14 @@ namespace LumiSoft.Net.IMAP.Client
         private IMAP_Client_SelectedFolder m_pSelectedFolder    = null;
         private IMAP_Mailbox_Encoding      m_MailboxEncoding    = IMAP_Mailbox_Encoding.ImapUtf7;
         private IdleAsyncOP                m_pIdle              = null;
+        private SettingsHolder             m_pSettings          = null;
 
         /// <summary>
         /// Default constructor.
         /// </summary>
         public IMAP_Client()
         {
+            m_pSettings = new SettingsHolder();
         }
 
 
@@ -403,6 +446,7 @@ namespace LumiSoft.Net.IMAP.Client
             m_pCapabilities      = null;
             m_pSelectedFolder    = null;
             m_MailboxEncoding    = IMAP_Mailbox_Encoding.ImapUtf7;
+            m_pSettings          = null;
 		}
 
 		#endregion
@@ -8713,9 +8757,7 @@ namespace LumiSoft.Net.IMAP.Client
             /// Default constructor.
             /// </summary>
             public ReadResponseAsyncOP()
-            {
-                m_pReadLineOP = new SmartStream.ReadLineAsyncOP(new byte[512000],SizeExceededAction.JunkAndThrowException);
-                m_pReadLineOP.Completed += new EventHandler<EventArgs<SmartStream.ReadLineAsyncOP>>(m_pReadLineOP_Completed);
+            {                
             }
                         
             #region method Dispose
@@ -8759,6 +8801,9 @@ namespace LumiSoft.Net.IMAP.Client
                 }
 
                 m_pImapClient = owner;
+
+                m_pReadLineOP = new SmartStream.ReadLineAsyncOP(new byte[m_pImapClient.Settings.ResponseLineSize],SizeExceededAction.JunkAndThrowException);
+                m_pReadLineOP.Completed += new EventHandler<EventArgs<SmartStream.ReadLineAsyncOP>>(m_pReadLineOP_Completed);
 
                 SetState(AsyncOP_State.Active);
 
@@ -9906,6 +9951,21 @@ namespace LumiSoft.Net.IMAP.Client
 			    }
 
                 return m_pIdle; 
+            }
+        }
+
+        /// <summary>
+        /// Gets IMAP client settings.
+        /// </summary>
+        /// <exception cref="ObjectDisposedException">Is raised when this object is disposed and this property is accessed.</exception>
+        public SettingsHolder Settings
+        {
+            get{ 
+                if(this.IsDisposed){
+                    throw new ObjectDisposedException(this.GetType().Name);
+                }
+
+                return m_pSettings; 
             }
         }
 
