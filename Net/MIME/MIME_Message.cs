@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
+using System.Security.Cryptography.X509Certificates;
 
 using LumiSoft.Net.IO;
 
@@ -246,6 +247,36 @@ namespace LumiSoft.Net.MIME
         // TODO:
         //public MIME_Entity GetEntityByPartsSpecifier(string partsSpecifier)
 
+        #region method ConvertToMultipartSigned
+
+        /// <summary>
+        /// Converts message to multipart/signed message.
+        /// </summary>
+        /// <param name="signerCert">>Signer certificate</param>
+        /// <exception cref="ArgumentNullException">Is raised when <b>signerCert</b> is null reference.</exception>
+        /// <exception cref="InvalidOperationException">Is raised when this method is called for already signed message.</exception>
+        public void ConvertToMultipartSigned(X509Certificate2 signerCert)
+        {
+            if(signerCert == null){
+                throw new ArgumentNullException("signerCert");
+            }
+            if(this.IsSigned){
+                throw new InvalidOperationException("Message is already signed.");
+            }
+
+            MIME_Entity msgEntity = new MIME_Entity();
+            msgEntity.Body = this.Body;
+            msgEntity.ContentDisposition = this.ContentDisposition;
+            msgEntity.ContentTransferEncoding = this.ContentTransferEncoding;
+            this.ContentTransferEncoding = null;
+
+            MIME_b_MultipartSigned multipartSigned = new MIME_b_MultipartSigned();
+            this.Body = multipartSigned;
+            multipartSigned.SetCertificate(signerCert);
+            multipartSigned.BodyParts.Add(msgEntity);
+        }
+
+        #endregion
 
         #region method VerifySignatures
 
