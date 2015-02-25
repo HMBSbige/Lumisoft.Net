@@ -3863,6 +3863,36 @@ namespace LumiSoft.Net.SMTP.Client
 
         #endregion
 
+        #region method SupportsCapability
+
+        /// <summary>
+        /// Gets if SMTP server supports the specified capability.
+        /// </summary>
+        /// <param name="capability">SMTP capability.</param>
+        /// <returns>Return true if SMTP server supports the specified capability.</returns>
+        /// <exception cref="ArgumentNullException">Is raised when <b>capability</b> is null reference.</exception>
+        private bool SupportsCapability(string capability)
+        {
+            if(capability == null){
+                throw new ArgumentNullException("capability");
+            }
+
+            if(m_pEsmtpFeatures == null){
+                return false;
+            }
+            else{
+                foreach(string c in m_pEsmtpFeatures){
+                    if(string.Equals(c,capability,StringComparison.InvariantCultureIgnoreCase)){
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        #endregion
+
                 
         #region static method QuickSend
 
@@ -4032,10 +4062,28 @@ namespace LumiSoft.Net.SMTP.Client
         /// <summary>
         /// Sends message by using specified smart host.
         /// </summary>
-        /// <param name="localHost">Host name which is reported to SMTP server.</param>
+        /// <param name="localHost">Host name which is reported to SMTP server. Value null means local computer name is used.</param>
         /// <param name="host">Host name or IP address.</param>
         /// <param name="port">Host port.</param>
         /// <param name="ssl">Specifies if connected via SSL.</param>
+        /// <param name="userName">SMTP server user name. This value may be null, then authentication not used.</param>
+        /// <param name="password">SMTP server password.</param>
+        /// <param name="message">Mail message to send.</param>
+        /// <exception cref="ArgumentNullException">Is raised when argument <b>host</b> or <b>message</b> is null.</exception>
+        /// <exception cref="ArgumentException">Is raised when any of the method arguments has invalid value.</exception>
+        /// <exception cref="SMTP_ClientException">Is raised when SMTP server returns error.</exception>
+        public static void QuickSendSmartHost(string localHost,string host,int port,TcpClientSecurity security,string userName,string password,Mail_Message message)
+        {
+            QuickSendSmartHost(localHost,host,port,security == TcpClientSecurity.SSL,userName,password,message);
+        }
+
+        /// <summary>
+        /// Sends message by using specified smart host.
+        /// </summary>
+        /// <param name="localHost">Host name which is reported to SMTP server. Value null means local computer name is used.</param>
+        /// <param name="host">Host name or IP address.</param>
+        /// <param name="port">Host port.</param>
+        /// <param name="security">Specifies connection security.</param>
         /// <param name="userName">SMTP server user name. This value may be null, then authentication not used.</param>
         /// <param name="password">SMTP server password.</param>
         /// <param name="message">Mail message to send.</param>
@@ -4118,7 +4166,7 @@ namespace LumiSoft.Net.SMTP.Client
         /// <summary>
         /// Sends message by using specified smart host.
         /// </summary>
-        /// <param name="localHost">Host name which is reported to SMTP server.</param>
+        /// <param name="localHost">Host name which is reported to SMTP server. Value null means local computer name is used.</param>
         /// <param name="host">Host name or IP address.</param>
         /// <param name="port">Host port.</param>
         /// <param name="ssl">Specifies if connected via SSL.</param>
@@ -4136,7 +4184,7 @@ namespace LumiSoft.Net.SMTP.Client
         /// <summary>
         /// Sends message by using specified smart host.
         /// </summary>
-        /// <param name="localHost">Host name which is reported to SMTP server.</param>
+        /// <param name="localHost">Host name which is reported to SMTP server. Value null means local computer name is used.</param>
         /// <param name="host">Host name or IP address.</param>
         /// <param name="port">Host port.</param>
         /// <param name="ssl">Specifies if connected via SSL.</param>
@@ -4149,6 +4197,26 @@ namespace LumiSoft.Net.SMTP.Client
         /// <exception cref="ArgumentException">Is raised when any of the method arguments has invalid value.</exception>
         /// <exception cref="SMTP_ClientException">Is raised when SMTP server returns error.</exception>
         public static void QuickSendSmartHost(string localHost,string host,int port,bool ssl,string userName,string password,string from,string[] to,Stream message)
+        {
+            QuickSendSmartHost(localHost,host,port,(ssl == true ? TcpClientSecurity.SSL : TcpClientSecurity.None),userName,password,from,to,message);
+        }
+
+        /// <summary>
+        /// Sends message by using specified smart host.
+        /// </summary>
+        /// <param name="localHost">Host name which is reported to SMTP server. Value null means local computer name is used.</param>
+        /// <param name="host">Host name or IP address.</param>
+        /// <param name="port">Host port.</param>
+        /// <param name="security">Specifies connection security.</param>
+        /// <param name="userName">SMTP server user name. This value may be null, then authentication not used.</param>
+        /// <param name="password">SMTP server password.</param>
+        /// <param name="from">Sender email what is reported to SMTP server.</param>
+        /// <param name="to">Recipients email addresses.</param>
+        /// <param name="message">Raw message to send.</param>
+        /// <exception cref="ArgumentNullException">Is raised when argument <b>host</b>,<b>from</b>,<b>to</b> or <b>stream</b> is null.</exception>
+        /// <exception cref="ArgumentException">Is raised when any of the method arguments has invalid value.</exception>
+        /// <exception cref="SMTP_ClientException">Is raised when SMTP server returns error.</exception>
+        public static void QuickSendSmartHost(string localHost,string host,int port,TcpClientSecurity security,string userName,string password,string from,string[] to,Stream message)
         {
             if(host == null){
                 throw new ArgumentNullException("host");
@@ -4181,7 +4249,10 @@ namespace LumiSoft.Net.SMTP.Client
             }
 
             using(SMTP_Client smtp = new SMTP_Client()){
-                smtp.Connect(host,port,ssl);                
+                smtp.Connect(host,port,security == TcpClientSecurity.SSL);
+                if(security == TcpClientSecurity.TLS || (security == TcpClientSecurity.UseTlsIfSupported && smtp.SupportsCapability(SMTP_ServiceExtensions.STARTTLS))){
+                    smtp.StartTLS();
+                }
                 smtp.EhloHelo(localHost != null ? localHost : Dns.GetHostName());
                 if(!string.IsNullOrEmpty(userName)){
                     smtp.Auth(smtp.AuthGetStrongestMethod(userName,password));
