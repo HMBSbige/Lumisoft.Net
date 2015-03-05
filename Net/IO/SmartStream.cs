@@ -1074,6 +1074,11 @@ namespace LumiSoft.Net.IO
             }
             m_IsDisposed = true;
 
+            if(m_pReadBufferOP != null){
+                m_pReadBufferOP.Dispose();
+            }
+            m_pReadBufferOP = null;
+
             if(m_IsOwner){
                 m_pStream.Dispose();
             }
@@ -2530,12 +2535,31 @@ namespace LumiSoft.Net.IO
         /// <param name="callback">An optional asynchronous callback, to be called when the write is complete.</param>
         /// <param name="state">A user-provided object that distinguishes this particular asynchronous write request from other requests.</param>
         /// <returns>An IAsyncResult that represents the asynchronous write, which could still be pending.</returns>
+        /// /// <exception cref="ObjectDisposedException">Is raised when this object is disposed and this method is accessed.</exception>
+        /// <exception cref="ArgumentNullException">Is raised when <b>buffer</b> is null reference.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Is raised when any of the arguments has out of valid range.</exception>
         public override IAsyncResult BeginWrite(byte[] buffer,int offset,int count,AsyncCallback callback,object state)
         {
+            if(m_IsDisposed){
+                throw new ObjectDisposedException("SmartStream");
+            }
+            if(buffer == null){
+                throw new ArgumentNullException("buffer");
+            }            
+            if(offset < 0){
+                throw new ArgumentOutOfRangeException("offset","Argument 'offset' value must be >= 0.");
+            }
+            if(count < 0){
+                throw new ArgumentOutOfRangeException("count","Argument 'count' value must be >= 0.");
+            }
+            if(offset + count > buffer.Length){
+                throw new ArgumentOutOfRangeException("count","Argument 'count' is bigger than than argument 'buffer' can store.");
+            }
+
             m_LastActivity  = DateTime.Now;
             m_BytesWritten += count;
 
-            return m_pStream.BeginWrite(buffer, offset, count, callback, state);
+            return m_pStream.BeginWrite(buffer,offset,count,callback,state);
         }
 
         #endregion
@@ -2546,8 +2570,13 @@ namespace LumiSoft.Net.IO
         /// Ends an asynchronous write operation.
         /// </summary>
         /// <param name="asyncResult">A reference to the outstanding asynchronous I/O request.</param>
+        /// <exception cref="ArgumentNullException">Is raised when <b>asyncResult</b> is null reference.</exception>
         public override void EndWrite(IAsyncResult asyncResult)
         {
+            if(asyncResult == null){
+                throw new ArgumentNullException("asyncResult");
+            }
+
             m_pStream.EndWrite(asyncResult);
         }
 
@@ -2659,6 +2688,15 @@ namespace LumiSoft.Net.IO
                 
 
         #region Properties Implementation
+
+        /// <summary>
+        /// Gets if this object is disposed.
+        /// </summary>
+        public bool IsDisposed
+        {
+            get{ return m_IsDisposed; }
+        }
+
 
         /// <summary>
         /// Gets this stream underlying stream.
