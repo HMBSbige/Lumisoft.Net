@@ -426,7 +426,6 @@ namespace LumiSoft.Net.IMAP.Server
             private class QueueItem
             {
                 private bool                               m_IsSent                  = false;
-                private bool                               m_IsAsync                 = false;
                 private IMAP_r                             m_pResponse               = null;
                 private EventHandler<EventArgs<Exception>> m_pCompletedAsyncCallback = null;
 
@@ -457,16 +456,6 @@ namespace LumiSoft.Net.IMAP.Server
                     get{ return m_IsSent; }
 
                     set{ m_IsSent = value; }
-                }
-
-                /// <summary>
-                /// Gets or sets if sending complte asynchronously.
-                /// </summary>
-                public bool IsAsync
-                {
-                    get{ return m_IsAsync; }
-
-                    set{ m_IsAsync = value; }
                 }
 
                 /// <summary>
@@ -553,26 +542,13 @@ namespace LumiSoft.Net.IMAP.Server
                     throw new ArgumentNullException("response");
                 }
 
-                lock(m_pLock){
-                    QueueItem responseItem = new QueueItem(response,completedAsyncCallback);
-                    m_pResponses.Enqueue(responseItem);
+                QueueItem responseItem = new QueueItem(response,completedAsyncCallback);
+                m_pResponses.Enqueue(responseItem);
 
-                    // Start sending response, no active response sending.
-                    if(!m_IsSending){
-                        SendResponsesAsync();
-                    }
+                // Start sending response(s).
+                SendResponsesAsync(false);
 
-                    // Response sent synchronously.
-                    if(responseItem.IsSent){
-                        return false;
-                    }
-                    // Response queued or sending is in progress.
-                    else{
-                        responseItem.IsAsync = true;
-
-                        return true;
-                    }
-                }
+                return !responseItem.IsSent;
             }
 
             #endregion
@@ -583,67 +559,71 @@ namespace LumiSoft.Net.IMAP.Server
             /// <summary>
             /// Starts sending queued responses.
             /// </summary>
-            private void SendResponsesAsync()
+            /// <param name="calledFromAsync">Specifies if this methd is called from asynchronous operation.</param>
+            private void SendResponsesAsync(bool calledFromAsync)
             {
-                m_IsSending = true;
+                lock(m_pLock){
+                    if(m_IsSending || m_pResponses.Count == 0){
+                        return;
+                    }
+                    m_IsSending = true;
+                }
 
                 QueueItem responseItem = null;
 
-                // Create callback which is called when ToStreamAsync comletes asynchronously.
+                // Create callback which is called when SendAsync completes asynchronously.
                 EventHandler<EventArgs<Exception>> completedAsyncCallback = delegate(object s,EventArgs<Exception> e){
                     try{
-                        lock(m_pLock){
-                            responseItem.IsSent = true;
-
-                            if(responseItem.IsAsync && responseItem.CompletedAsyncCallback != null){
-                                responseItem.CompletedAsyncCallback(this,e);
-                            }
+                        // Call callback.
+                        if(responseItem.CompletedAsyncCallback != null){
+                            responseItem.CompletedAsyncCallback(this,e);
                         }
 
-                        // There are more responses available, send them.
-                        if(m_pResponses.Count > 0){
-                            SendResponsesAsync();
-                        }
-                        // We are done.
-                        else{
-                            lock(m_pLock){
-                                m_IsSending = false;
-                            }
-                        }
+                        // We don't need lock here, we don't care if some Thread or our call to SendResponsesAsync continues responses sending.
+                        m_IsSending = false;
+                                                                        
+                        // Continue sending queued responses, if any.
+                        SendResponsesAsync(true);
                     }
-                    catch(Exception x){
-                        lock(m_pLock){
-                            m_IsSending = false;
-                        }
+                    catch(Exception x){                     
                         m_pImap.OnError(x);
+                         m_IsSending = false;
                     }
                 };
 
-                // Send responses.
-                while(m_pResponses.Count > 0){
-                    responseItem = m_pResponses.Dequeue();
+                try{
+                    // Send responses.
+                    while(m_pResponses.Count > 0){
+                        responseItem = m_pResponses.Dequeue();
 
-                    // Response sending completed asynchronously, completedAsyncCallback will be called when operation completes.
-                    if(responseItem.Response.SendAsync(m_pImap,completedAsyncCallback)){
-                        return;
-                    }
-                    // Response sending completed synchronously.
-                    else{
-                        lock(m_pLock){
+                        // Response sending completed asynchronously, completedAsyncCallback will be called when operation completes.
+                        if(responseItem.Response.SendAsync(m_pImap,completedAsyncCallback)){
+                            return;
+                        }
+                        // Response sending completed synchronously.
+                        else{
                             responseItem.IsSent = true;
 
                             // This method(SendResponsesAsync) is called from completedAsyncCallback.
                             // Response sending has completed asynchronously, call callback.
-                            if(responseItem.IsAsync && responseItem.CompletedAsyncCallback != null){
+                            if(calledFromAsync && responseItem.CompletedAsyncCallback != null){
                                 responseItem.CompletedAsyncCallback(this,new EventArgs<Exception>(null));
+                            }
+                        }
+
+                        lock(m_pLock){
+                            if(m_pResponses.Count == 0){                    
+                                m_IsSending = false;
+
+                                return;
                             }
                         }
                     }
                 }
-
-                lock(m_pLock){
+                catch(Exception x){
+                    m_pImap.OnError(x);
                     m_IsSending = false;
-                }
+                }                
             }
 
             #endregion
