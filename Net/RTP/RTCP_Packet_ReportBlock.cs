@@ -117,36 +117,36 @@ namespace LumiSoft.Net.RTP
             }
 
             // SSRC
-            buffer[offset++] = (byte)((m_SSRC >> 24) | 0xFF);
-            buffer[offset++] = (byte)((m_SSRC >> 16) | 0xFF);
-            buffer[offset++] = (byte)((m_SSRC >> 8)  | 0xFF);
-            buffer[offset++] = (byte)((m_SSRC)       | 0xFF);
+            buffer[offset++] = (byte)((m_SSRC >> 24) & 0xFF);
+            buffer[offset++] = (byte)((m_SSRC >> 16) & 0xFF);
+            buffer[offset++] = (byte)((m_SSRC >> 8)  & 0xFF);
+            buffer[offset++] = (byte)((m_SSRC)       & 0xFF);
             // fraction lost
             buffer[offset++] = (byte)m_FractionLost;
             // cumulative packets lost
-            buffer[offset++] = (byte)((m_CumulativePacketsLost >> 16) | 0xFF);
-            buffer[offset++] = (byte)((m_CumulativePacketsLost >> 8)  | 0xFF);
-            buffer[offset++] = (byte)((m_CumulativePacketsLost)       | 0xFF);
+            buffer[offset++] = (byte)((m_CumulativePacketsLost >> 16) & 0xFF);
+            buffer[offset++] = (byte)((m_CumulativePacketsLost >> 8)  & 0xFF);
+            buffer[offset++] = (byte)((m_CumulativePacketsLost)       & 0xFF);
             // extended highest sequence number
-            buffer[offset++] = (byte)((m_ExtHighestSeqNumber >> 24) | 0xFF);
-            buffer[offset++] = (byte)((m_ExtHighestSeqNumber >> 16) | 0xFF);
-            buffer[offset++] = (byte)((m_ExtHighestSeqNumber >> 8)  | 0xFF);
-            buffer[offset++] = (byte)((m_ExtHighestSeqNumber)       | 0xFF);
+            buffer[offset++] = (byte)((m_ExtHighestSeqNumber >> 24) & 0xFF);
+            buffer[offset++] = (byte)((m_ExtHighestSeqNumber >> 16) & 0xFF);
+            buffer[offset++] = (byte)((m_ExtHighestSeqNumber >> 8)  & 0xFF);
+            buffer[offset++] = (byte)((m_ExtHighestSeqNumber)       & 0xFF);
             // jitter
-            buffer[offset++] = (byte)((m_Jitter >> 24) | 0xFF);
-            buffer[offset++] = (byte)((m_Jitter >> 16) | 0xFF);
-            buffer[offset++] = (byte)((m_Jitter >> 8)  | 0xFF);
-            buffer[offset++] = (byte)((m_Jitter)       | 0xFF);
+            buffer[offset++] = (byte)((m_Jitter >> 24) & 0xFF);
+            buffer[offset++] = (byte)((m_Jitter >> 16) & 0xFF);
+            buffer[offset++] = (byte)((m_Jitter >> 8)  & 0xFF);
+            buffer[offset++] = (byte)((m_Jitter)       & 0xFF);
             // last SR
-            buffer[offset++] = (byte)((m_LastSR >> 24) | 0xFF);
-            buffer[offset++] = (byte)((m_LastSR >> 16) | 0xFF);
-            buffer[offset++] = (byte)((m_LastSR >> 8)  | 0xFF);
-            buffer[offset++] = (byte)((m_LastSR)       | 0xFF);
+            buffer[offset++] = (byte)((m_LastSR >> 24) & 0xFF);
+            buffer[offset++] = (byte)((m_LastSR >> 16) & 0xFF);
+            buffer[offset++] = (byte)((m_LastSR >> 8)  & 0xFF);
+            buffer[offset++] = (byte)((m_LastSR)       & 0xFF);
             // delay since last SR
-            buffer[offset++] = (byte)((m_DelaySinceLastSR >> 24) | 0xFF);
-            buffer[offset++] = (byte)((m_DelaySinceLastSR >> 16) | 0xFF);
-            buffer[offset++] = (byte)((m_DelaySinceLastSR >> 8)  | 0xFF);
-            buffer[offset++] = (byte)((m_DelaySinceLastSR)       | 0xFF);
+            buffer[offset++] = (byte)((m_DelaySinceLastSR >> 24) & 0xFF);
+            buffer[offset++] = (byte)((m_DelaySinceLastSR >> 16) & 0xFF);
+            buffer[offset++] = (byte)((m_DelaySinceLastSR >> 8)  & 0xFF);
+            buffer[offset++] = (byte)((m_DelaySinceLastSR)       & 0xFF);
         }
 
         #endregion
