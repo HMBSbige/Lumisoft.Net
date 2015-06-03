@@ -53,11 +53,13 @@ namespace LumiSoft.Net.RTP
                 throw new ArgumentException("Argument 'offset' value must be >= 0.");
             }
 
-                 m_Version   = buffer[offset] >> 6;
-            bool isPadded    = Convert.ToBoolean((buffer[offset] >> 5) & 0x1);
-            int  sourceCount = buffer[offset++] & 0x1F;
-            int  type        = buffer[offset++];
-            int  length      = buffer[offset++] << 8 | buffer[offset++];
+                 m_Version     = buffer[offset] >> 6;
+            bool isPadded      = Convert.ToBoolean((buffer[offset] >> 5) & 0x1);
+            int  sourceCount   = buffer[offset++] & 0x1F;
+            int  type          = buffer[offset++];
+            int  length        = buffer[offset++] << 8 | buffer[offset++]; 
+            // Calculate length in bytes. Length is 32 bit words(4 byte boundaries).
+            int  lengthInBytes = length * 4;
             if(isPadded){
                 this.PaddBytesCount = buffer[offset + length];
             }
@@ -68,7 +70,7 @@ namespace LumiSoft.Net.RTP
             }
 
             // See if we have optional reason text.
-            if(length > m_Sources.Length * 4){
+            if(lengthInBytes > offset){
                 int reasonLength = buffer[offset++];
                 m_LeavingReason = Encoding.UTF8.GetString(buffer,offset,reasonLength);
                 offset += reasonLength;
