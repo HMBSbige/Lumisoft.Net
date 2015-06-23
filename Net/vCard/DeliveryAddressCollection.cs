@@ -44,16 +44,22 @@ namespace LumiSoft.Net.Mime.vCard
         public void Add(DeliveryAddressType_enum type,string postOfficeAddress,string extendedAddress,string street,string locality,string region,string postalCode,string country)
         {   
             string value = "" +
-                postOfficeAddress + ";" +
-                extendedAddress + ";" +
-                street + ";" +
-                locality + ";" +
-                region + ";" +
-                postalCode + ";" +
-                country;
+                vCard_Utils.Encode(m_pOwner.Version,m_pOwner.Charset,postOfficeAddress) + ";" +
+                vCard_Utils.Encode(m_pOwner.Version,m_pOwner.Charset,extendedAddress) + ";" +
+                vCard_Utils.Encode(m_pOwner.Version,m_pOwner.Charset,street) + ";" +
+                vCard_Utils.Encode(m_pOwner.Version,m_pOwner.Charset,locality) + ";" +
+                vCard_Utils.Encode(m_pOwner.Version,m_pOwner.Charset,region) + ";" +
+                vCard_Utils.Encode(m_pOwner.Version,m_pOwner.Charset,postalCode) + ";" +
+                vCard_Utils.Encode(m_pOwner.Version,m_pOwner.Charset,country);
+            
 
             Item item = m_pOwner.Items.Add("ADR",DeliveryAddress.AddressTypeToString(type),"");
-            item.SetDecodedValue(value);
+            item.FoldLongLines = false;
+            if(m_pOwner.Version.StartsWith("2")){
+                item.ParametersString += ";ENCODING=QUOTED-PRINTABLE";
+            }
+            item.ParametersString += ";CHARSET=" + m_pOwner.Charset.WebName;
+            item.Value = value;
             m_pCollection.Add(new DeliveryAddress(item,type,postOfficeAddress,extendedAddress,street,locality,region,postalCode,country));
         }
 

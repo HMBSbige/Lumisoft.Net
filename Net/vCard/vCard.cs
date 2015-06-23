@@ -11,6 +11,7 @@ namespace LumiSoft.Net.Mime.vCard
     /// </summary>
     public class vCard
     {
+        private Encoding                  m_pCharset        = null;
         private ItemCollection            m_pItems          = null;
         private DeliveryAddressCollection m_pAddresses      = null;
         private PhoneNumberCollection     m_pPhoneNumbers   = null;
@@ -21,7 +22,8 @@ namespace LumiSoft.Net.Mime.vCard
         /// </summary>
         public vCard()
         {
-            m_pItems          = new ItemCollection();
+            m_pCharset        = Encoding.UTF8;
+            m_pItems          = new ItemCollection(this);
             this.Version      = "3.0";
             this.UID          = Guid.NewGuid().ToString();
         }
@@ -78,7 +80,7 @@ namespace LumiSoft.Net.Mime.vCard
             }
             retVal.Append("END:VCARD\r\n");
 
-            byte[] data = System.Text.Encoding.UTF8.GetBytes(retVal.ToString());
+            byte[] data = m_pCharset.GetBytes(retVal.ToString());
             stream.Write(data,0,data.Length);
         }
 
@@ -218,6 +220,22 @@ namespace LumiSoft.Net.Mime.vCard
         #region Properties Implementation
 
         /// <summary>
+        /// Gets or sets charset used by vcard. NOTE: Since version 3.0, the only allowed value is UTF-8.
+        /// </summary>
+        public Encoding Charset
+        {        
+            get{ return m_pCharset; }
+
+            set{
+                if(value == null){
+                    throw new ArgumentNullException("value");
+                }
+
+                m_pCharset = value;
+            }
+        }
+
+        /// <summary>
         /// Gets reference to vCard items.
         /// </summary>
         public ItemCollection Items
@@ -240,7 +258,7 @@ namespace LumiSoft.Net.Mime.vCard
                 }
             }
 
-            set{ m_pItems.SetDecodedValue("VERSION",value); }
+            set{ m_pItems.SetValue("VERSION",value); }
         }
 
         /// <summary>

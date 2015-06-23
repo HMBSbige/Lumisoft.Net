@@ -10,13 +10,17 @@ namespace LumiSoft.Net.Mime.vCard
     /// </summary>
     public class ItemCollection : IEnumerable
     {
+        private vCard      m_pCard  = null;
         private List<Item> m_pItems = null;
 
         /// <summary>
         /// Default constructor.
         /// </summary>
-        internal ItemCollection()
+        /// <param name="card">Owner card.</param>
+        internal ItemCollection(vCard card)
         {
+            m_pCard = card;
+
             m_pItems = new List<Item>();
         }
 
@@ -31,7 +35,7 @@ namespace LumiSoft.Net.Mime.vCard
         /// <param name="value">Item value.</param>
         public Item Add(string name,string parametes,string value)
         {
-            Item item = new Item(name,parametes,value);
+            Item item = new Item(m_pCard,name,parametes,value);
             m_pItems.Add(item);
 
             return item;
@@ -141,7 +145,7 @@ namespace LumiSoft.Net.Mime.vCard
                 item.SetDecodedValue(value);
             }
             else{
-                item = new Item(name,"","");
+                item = new Item(m_pCard,name,"","");
                 m_pItems.Add(item);
                 item.SetDecodedValue(value);
             }
@@ -181,7 +185,7 @@ namespace LumiSoft.Net.Mime.vCard
                 item.Value = value;
             }
             else{
-                m_pItems.Add(new Item(name,parametes,value));
+                m_pItems.Add(new Item(m_pCard,name,parametes,value));
             }
         }
 

@@ -53,16 +53,17 @@ namespace LumiSoft.Net.Mime.vCard
         private void Changed()
         {
             string value = "" +
-                m_PostOfficeAddress + ";" +
-                m_ExtendedAddress + ";" +
-                m_Street + ";" +
-                m_Locality + ";" +
-                m_Region + ";" +
-                m_PostalCode + ";" +
-                m_Country;
+                vCard_Utils.Encode(m_pItem.Owner.Version,m_pItem.Owner.Charset,m_PostOfficeAddress) + ";" +
+                vCard_Utils.Encode(m_pItem.Owner.Version,m_pItem.Owner.Charset,m_ExtendedAddress) + ";" +
+                vCard_Utils.Encode(m_pItem.Owner.Version,m_pItem.Owner.Charset,m_Street) + ";" +
+                vCard_Utils.Encode(m_pItem.Owner.Version,m_pItem.Owner.Charset,m_Locality) + ";" +
+                vCard_Utils.Encode(m_pItem.Owner.Version,m_pItem.Owner.Charset,m_Region) + ";" +
+                vCard_Utils.Encode(m_pItem.Owner.Version,m_pItem.Owner.Charset,m_PostalCode) + ";" +
+                vCard_Utils.Encode(m_pItem.Owner.Version,m_pItem.Owner.Charset,m_Country);
 
             m_pItem.ParametersString = AddressTypeToString(m_Type);
-            m_pItem.SetDecodedValue(value);
+            m_pItem.ParametersString += ";CHARSET=utf-8";
+            m_pItem.Value = value;
         }
 
         #endregion

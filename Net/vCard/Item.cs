@@ -11,18 +11,22 @@ namespace LumiSoft.Net.Mime.vCard
     /// </summary>
     public class Item
     {
+        private vCard  m_pCard      = null;
         private string m_Name       = "";
         private string m_Parameters = "";
         private string m_Value      = "";
+        private bool   m_FoldData   = true;
 
         /// <summary>
         /// Default constructor.
         /// </summary>
+        /// <param name="card">Owner card.</param>
         /// <param name="name">Item name.</param>
         /// <param name="parameters">Item parameters.</param>
         /// <param name="value">Item encoded value value.</param>
-        internal Item(string name,string parameters,string value)
+        internal Item(vCard card,string name,string parameters,string value)
         {
+            m_pCard      = card;
             m_Name       = name;
             m_Parameters = parameters;
             m_Value      = value;
@@ -33,7 +37,6 @@ namespace LumiSoft.Net.Mime.vCard
 
         /// <summary>
         /// Sets item decoded value. Value will be encoded as needed and stored to item.Value property.
-        /// Also property item.ParametersString is updated to reflect right encoding(always base64, required by rfc) and charset (utf-8).
         /// </summary>
         /// <param name="value"></param>
         public void SetDecodedValue(string value)
@@ -49,26 +52,39 @@ namespace LumiSoft.Net.Mime.vCard
                 Any COMMA or SEMICOLON in a text type value must be backslash escaped.
             */
             
-            if(NeedEncode(value)){
-                // Remove encoding and charset parameters
-                string newParmString = "";
-                string[] parameters = m_Parameters.ToLower().Split(';');
-                foreach(string parameter in parameters){
-                    string[] name_value = parameter.Split('=');
-                    if(name_value[0] == "encoding" || name_value[0] == "charset"){                        
-                    }
-                    else if(parameter.Length > 0){
-                        newParmString += parameter + ";";
-                    }
+            // Remove encoding and charset parameters
+            string newParmString = "";
+            string[] parameters = m_Parameters.ToLower().Split(';');
+            foreach(string parameter in parameters){
+                string[] name_value = parameter.Split('=');
+                if(name_value[0] == "encoding" || name_value[0] == "charset"){                        
                 }
+                else if(parameter.Length > 0){
+                    newParmString += parameter + ";";
+                }
+            }            
+
+            if(m_pCard.Version.StartsWith("3")){
                 // Add encoding parameter
-                newParmString += "ENCODING=b;CHARSET=utf-8";
-      
+                if(!Net_Utils.IsAscii(value)){
+                    newParmString += "CHARSET=utf-8";
+                }
+
                 this.ParametersString = newParmString;
-                this.Value = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(value));
+                this.Value = vCard_Utils.Encode(m_pCard.Version,m_pCard.Charset,value);
             }
-            else{
-                this.Value = value;
+            else{                
+                if(NeedEncode(value)){
+                    // Add encoding parameter
+                    newParmString += "ENCODING=QUOTED-PRINTABLE;CHARSET=" + m_pCard.Charset.WebName;
+
+                    this.ParametersString = newParmString;
+                    this.Value = vCard_Utils.Encode(m_pCard.Version,m_pCard.Charset,value);
+                }
+                else{
+                    this.ParametersString = newParmString;
+                    this.Value = value;
+                }
             }
         }
 
@@ -83,11 +99,16 @@ namespace LumiSoft.Net.Mime.vCard
         /// <returns></returns>
         internal string ToItemString()
         {
+            string value = m_Value;
+            if(m_FoldData){
+                value = FoldData(value);
+            }
+
             if(m_Parameters.Length > 0){
-                return m_Name + ";" + m_Parameters + ":" + FoldData(m_Value);
+                return m_Name + ";" + m_Parameters + ":" + value;
             }
             else{
-                return m_Name + ":" + FoldData(m_Value);
+                return m_Name + ":" + value;
             }
         }
 
@@ -121,7 +142,6 @@ namespace LumiSoft.Net.Mime.vCard
         #endregion
 
 
-        // Is it needed ?
         #region static method FoldData
 
         /// <summary>
@@ -243,7 +263,7 @@ namespace LumiSoft.Net.Mime.vCard
                     if(encoding == "quoted-printable"){
                         data = System.Text.Encoding.Default.GetString(MIME_Utils.QuotedPrintableDecode(System.Text.Encoding.Default.GetBytes(data)));
                     }
-                    else if(encoding == "b"){
+                    else if(encoding == "b" || encoding == "base64"){
                         data = System.Text.Encoding.Default.GetString(Net_Utils.FromBase64(System.Text.Encoding.Default.GetBytes(data)));
                     }
                     else{
@@ -261,6 +281,25 @@ namespace LumiSoft.Net.Mime.vCard
 
                 return data; 
             }
+        }
+
+        /// <summary>
+        /// Gets or sets if long data lines are foolded.
+        /// </summary>
+        public bool FoldLongLines
+        {
+            get{ return m_FoldData; }
+
+            set{ m_FoldData = value; }
+        }
+
+
+        /// <summary>
+        /// Gets owner.
+        /// </summary>        
+        internal vCard Owner
+        {
+            get{ return m_pCard; }
         }
 
         #endregion
