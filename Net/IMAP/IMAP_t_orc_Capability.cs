@@ -29,23 +29,23 @@ namespace LumiSoft.Net.IMAP
         #region static method Parse
 
         /// <summary>
-        /// Parses CAPABILITY optional response from string.
+        /// Parses CAPABILITY optional response from reader.
         /// </summary>
-        /// <param name="value">CAPABILITY optional response string.</param>
+        /// <param name="r">CAPABILITY optional response reader.</param>
         /// <returns>Returns CAPABILITY optional response.</returns>
-        /// <exception cref="ArgumentNullException">Is raised when <b>value</b> is null reference.</exception>
-        public new static IMAP_t_orc_Capability Parse(string value)
+        /// <exception cref="ArgumentNullException">Is raised when <b>r</b> is null reference.</exception>
+        public new static IMAP_t_orc_Capability Parse(StringReader r)
         {
-            if(value == null){
-                throw new ArgumentNullException("value");
+            if(r == null){
+                throw new ArgumentNullException("r");
             }
 
-            string[] code_value = value.Split(new char[]{' '},2);
+            string[] code_value = r.ReadParenthesized().Split(new char[]{' '},2);
             if(!string.Equals("CAPABILITY",code_value[0],StringComparison.InvariantCultureIgnoreCase)){
-                throw new ArgumentException("Invalid CAPABILITY response value.","value");
+                throw new ArgumentException("Invalid CAPABILITY response value.","r");
             }
             if(code_value.Length != 2){
-                throw new ArgumentException("Invalid CAPABILITY response value.","value");
+                throw new ArgumentException("Invalid CAPABILITY response value.","r");
             }
 
             return new IMAP_t_orc_Capability(code_value[1].Split(' '));

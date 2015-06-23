@@ -97,12 +97,12 @@ namespace LumiSoft.Net.IMAP
                 string     commandTag   = parts[0];
                 string     responseCode = parts[1];
                 IMAP_t_orc optResponse  = null;
-                string   responseText   = parts[2];
+                string     responseText = parts[2];
 
                 // Optional status code.
                 if(parts[2].StartsWith("[")){
                     StringReader r = new StringReader(parts[2]);
-                    optResponse  = IMAP_t_orc.Parse(r.ReadParenthesized());
+                    optResponse  = IMAP_t_orc.Parse(r);
                     responseText = r.ReadToEnd();
                 }
 

@@ -24,23 +24,23 @@ namespace LumiSoft.Net.IMAP
         #region static method Parse
 
         /// <summary>
-        /// Parses UIDVALIDITY optional response from string.
+        /// Parses UIDVALIDITY optional response from reader.
         /// </summary>
-        /// <param name="value">UIDVALIDITY optional response string.</param>
+        /// <param name="r">UIDVALIDITY optional response reader.</param>
         /// <returns>Returns UIDVALIDITY optional response.</returns>
-        /// <exception cref="ArgumentNullException">Is raised when <b>value</b> is null reference.</exception>
-        public new static IMAP_t_orc_UidValidity Parse(string value)
+        /// <exception cref="ArgumentNullException">Is raised when <b>r</b> is null reference.</exception>
+        public new static IMAP_t_orc_UidValidity Parse(StringReader r)
         {
-            if(value == null){
-                throw new ArgumentNullException("value");
+            if(r == null){
+                throw new ArgumentNullException("r");
             }
 
-            string[] code_value = value.Split(new char[]{' '},2);
+            string[] code_value = r.ReadParenthesized().Split(new char[]{' '},2);
             if(!string.Equals("UIDVALIDITY",code_value[0],StringComparison.InvariantCultureIgnoreCase)){
-                throw new ArgumentException("Invalid UIDVALIDITY response value.","value");
+                throw new ArgumentException("Invalid UIDVALIDITY response value.","r");
             }
             if(code_value.Length != 2){
-                throw new ArgumentException("Invalid UIDVALIDITY response value.","value");
+                throw new ArgumentException("Invalid UIDVALIDITY response value.","r");
             }
 
             return new IMAP_t_orc_UidValidity(Convert.ToInt64(code_value[1]));

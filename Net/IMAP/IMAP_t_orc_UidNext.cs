@@ -24,23 +24,23 @@ namespace LumiSoft.Net.IMAP
         #region static method Parse
 
         /// <summary>
-        /// Parses UIDNEXT optional response from string.
+        /// Parses UIDNEXT optional response from reader.
         /// </summary>
-        /// <param name="value">UIDNEXT optional response string.</param>
+        /// <param name="r">UIDNEXT optional response reader.</param>
         /// <returns>Returns UIDNEXT optional response.</returns>
-        /// <exception cref="ArgumentNullException">Is raised when <b>value</b> is null reference.</exception>
-        public new static IMAP_t_orc_UidNext Parse(string value)
+        /// <exception cref="ArgumentNullException">Is raised when <b>r</b> is null reference.</exception>
+        public new static IMAP_t_orc_UidNext Parse(StringReader r)
         {
-            if(value == null){
-                throw new ArgumentNullException("value");
+            if(r == null){
+                throw new ArgumentNullException("r");
             }
 
-            string[] code_value = value.Split(new char[]{' '},2);
+            string[] code_value = r.ReadParenthesized().Split(new char[]{' '},2);
             if(!string.Equals("UIDNEXT",code_value[0],StringComparison.InvariantCultureIgnoreCase)){
-                throw new ArgumentException("Invalid UIDNEXT response value.","value");
+                throw new ArgumentException("Invalid UIDNEXT response value.","r");
             }
             if(code_value.Length != 2){
-                throw new ArgumentException("Invalid UIDNEXT response value.","value");
+                throw new ArgumentException("Invalid UIDNEXT response value.","r");
             }
 
             return new IMAP_t_orc_UidNext(Convert.ToInt32(code_value[1]));

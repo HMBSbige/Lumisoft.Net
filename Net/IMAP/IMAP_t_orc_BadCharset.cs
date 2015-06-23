@@ -29,20 +29,20 @@ namespace LumiSoft.Net.IMAP
         #region static method Parse
 
         /// <summary>
-        /// Parses BADCHARSET optional response from string.
+        /// Parses BADCHARSET optional response from reader.
         /// </summary>
-        /// <param name="value">BADCHARSET optional response string.</param>
+        /// <param name="r">BADCHARSET optional response reader.</param>
         /// <returns>Returns BADCHARSET optional response.</returns>
-        /// <exception cref="ArgumentNullException">Is raised when <b>value</b> is null reference.</exception>
-        public new static IMAP_t_orc_BadCharset Parse(string value)
+        /// <exception cref="ArgumentNullException">Is raised when <b>r</b> is null reference.</exception>
+        public new static IMAP_t_orc_BadCharset Parse(StringReader r)
         {
-            if(value == null){
-                throw new ArgumentNullException("value");
+            if(r == null){
+                throw new ArgumentNullException("r");
             }
 
-            string[] code_value = value.Split(new char[]{' '},2);
+            string[] code_value = r.ReadParenthesized().Split(new char[]{' '},2);
             if(!string.Equals("BADCHARSET",code_value[0],StringComparison.InvariantCultureIgnoreCase)){
-                throw new ArgumentException("Invalid BADCHARSET response value.","value");
+                throw new ArgumentException("Invalid BADCHARSET response value.","r");
             }
 
             return new IMAP_t_orc_BadCharset(code_value[1].Trim().Split(' '));

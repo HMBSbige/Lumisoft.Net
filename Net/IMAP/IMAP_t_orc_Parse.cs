@@ -29,20 +29,20 @@ namespace LumiSoft.Net.IMAP
         #region static method Parse
 
         /// <summary>
-        /// Parses PARSE optional response from string.
+        /// Parses PARSE optional response from reader.
         /// </summary>
-        /// <param name="value">PARSE optional response string.</param>
+        /// <param name="r">PARSE optional response reader.</param>
         /// <returns>Returns PARSE optional response.</returns>
-        /// <exception cref="ArgumentNullException">Is raised when <b>value</b> is null reference.</exception>
-        public new static IMAP_t_orc_Parse Parse(string value)
+        /// <exception cref="ArgumentNullException">Is raised when <b>r</b> is null reference.</exception>
+        public new static IMAP_t_orc_Parse Parse(StringReader r)
         {
-            if(value == null){
-                throw new ArgumentNullException("value");
+            if(r == null){
+                throw new ArgumentNullException("r");
             }
 
-            string[] code_value = value.Split(new char[]{' '},2);
+            string[] code_value = r.ReadParenthesized().Split(new char[]{' '},2);
             if(!string.Equals("PARSE",code_value[0],StringComparison.InvariantCultureIgnoreCase)){
-                throw new ArgumentException("Invalid PARSE response value.","value");
+                throw new ArgumentException("Invalid PARSE response value.","r");
             }
 
             return new IMAP_t_orc_Parse(code_value.Length == 2 ? code_value[1] : "");

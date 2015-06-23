@@ -29,18 +29,18 @@ namespace LumiSoft.Net.IMAP
         #region static method Parse
 
         /// <summary>
-        /// Parses unknown optional response from string.
+        /// Parses unknown optional response from reader.
         /// </summary>
-        /// <param name="value">Unknown optional response string.</param>
+        /// <param name="r">Unknown optional response reader.</param>
         /// <returns>Returns unknown optional response.</returns>
-        /// <exception cref="ArgumentNullException">Is raised when <b>value</b> is null reference.</exception>
-        public new static IMAP_t_orc_Unknown Parse(string value)
+        /// <exception cref="ArgumentNullException">Is raised when <b>r</b> is null reference.</exception>
+        public new static IMAP_t_orc_Unknown Parse(StringReader r)
         {
-            if(value == null){
-                throw new ArgumentNullException("value");
+            if(r == null){
+                throw new ArgumentNullException("r");
             }
 
-            return new IMAP_t_orc_Unknown(value);
+            return new IMAP_t_orc_Unknown(r.ReadParenthesized());
         }
 
         #endregion

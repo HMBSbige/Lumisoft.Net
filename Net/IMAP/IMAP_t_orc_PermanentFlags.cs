@@ -31,27 +31,29 @@ namespace LumiSoft.Net.IMAP
         /// <summary>
         /// Parses PERMANENTFLAGS optional response from string.
         /// </summary>
-        /// <param name="value">PERMANENTFLAGS optional response string.</param>
+        /// <param name="r">PERMANENTFLAGS optional response reader.</param>
         /// <returns>Returns PERMANENTFLAGS optional response.</returns>
-        /// <exception cref="ArgumentNullException">Is raised when <b>value</b> is null reference.</exception>
-        public new static IMAP_t_orc_PermanentFlags Parse(string value)
+        /// <exception cref="ArgumentNullException">Is raised when <b>r</b> is null reference.</exception>
+        public new static IMAP_t_orc_PermanentFlags Parse(StringReader r)
         {
-            if(value == null){
-                throw new ArgumentNullException("value");
+            if(r == null){
+                throw new ArgumentNullException("r");
             }
 
-            string[] code_value = value.Split(new char[]{' '},2);
-            if(!string.Equals("PERMANENTFLAGS",code_value[0],StringComparison.InvariantCultureIgnoreCase)){
-                throw new ArgumentException("Invalid PERMANENTFLAGS response value.","value");
-            }
-            if(code_value.Length != 2){
-                throw new ArgumentException("Invalid PERMANENTFLAGS response value.","value");
+            if(!r.StartsWith("[PERMANENTFLAGS",false)){
+                throw new ArgumentException("Invalid PERMANENTFLAGS response value.","r");
             }
 
-            StringReader r = new StringReader(code_value[1]);
+            // Read [
+            r.ReadSpecifiedLength(1);
+            // Read PERMANENTFLAGS
             r.ReadWord();
+            r.ReadToFirstChar();
+            string[] flags = r.ReadParenthesized().Split(' ');
+            // Read ]
+            r.ReadSpecifiedLength(1);
 
-            return new IMAP_t_orc_PermanentFlags(r.ReadParenthesized().Split(' '));
+            return new IMAP_t_orc_PermanentFlags(flags);
         }
 
         #endregion

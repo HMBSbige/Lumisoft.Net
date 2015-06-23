@@ -20,20 +20,20 @@ namespace LumiSoft.Net.IMAP
         #region static method Parse
 
         /// <summary>
-        /// Parses TRYCREATE optional response from string.
+        /// Parses TRYCREATE optional response from reader.
         /// </summary>
-        /// <param name="value">TRYCREATE optional response string.</param>
+        /// <param name="r">TRYCREATE optional response reader.</param>
         /// <returns>Returns TRYCREATE optional response.</returns>
-        /// <exception cref="ArgumentNullException">Is raised when <b>value</b> is null reference.</exception>
-        public new static IMAP_t_orc_TryCreate Parse(string value)
+        /// <exception cref="ArgumentNullException">Is raised when <b>r</b> is null reference.</exception>
+        public new static IMAP_t_orc_TryCreate Parse(StringReader r)
         {
-            if(value == null){
-                throw new ArgumentNullException("value");
+            if(r == null){
+                throw new ArgumentNullException("r");
             }
 
-            string[] code_value = value.Split(new char[]{' '},2);
+            string[] code_value = r.ReadParenthesized().Split(new char[]{' '},2);
             if(!string.Equals("TRYCREATE",code_value[0],StringComparison.InvariantCultureIgnoreCase)){
-                throw new ArgumentException("Invalid TRYCREATE response value.","value");
+                throw new ArgumentException("Invalid TRYCREATE response value.","r");
             }
 
             return new IMAP_t_orc_TryCreate();

@@ -27,15 +27,15 @@ namespace LumiSoft.Net.IMAP
         #region static method Parse
 
         /// <summary>
-        /// Parses APPENDUID optional response from string.
+        /// Parses APPENDUID optional response from reader.
         /// </summary>
-        /// <param name="value">APPENDUID optional response string.</param>
+        /// <param name="r">APPENDUID optional response reader.</param>
         /// <returns>Returns APPENDUID optional response.</returns>
-        /// <exception cref="ArgumentNullException">Is raised when <b>value</b> is null reference.</exception>
-        public new static IMAP_t_orc_AppendUid Parse(string value)
+        /// <exception cref="ArgumentNullException">Is raised when <b>r</b> is null reference.</exception>
+        public new static IMAP_t_orc_AppendUid Parse(StringReader r)
         {
-            if(value == null){
-                throw new ArgumentNullException("value");
+            if(r == null){
+                throw new ArgumentNullException("r");
             }
 
             /* RFC 4315 3.
@@ -46,12 +46,12 @@ namespace LumiSoft.Net.IMAP
                   mailbox with that UID.
             */
 
-            string[] code_mailboxUid_msgUid = value.Split(new char[]{' '},3);
+            string[] code_mailboxUid_msgUid = r.ReadParenthesized().Split(new char[]{' '},3);
             if(!string.Equals("APPENDUID",code_mailboxUid_msgUid[0],StringComparison.InvariantCultureIgnoreCase)){
-                throw new ArgumentException("Invalid APPENDUID response value.","value");
+                throw new ArgumentException("Invalid APPENDUID response value.","r");
             }
             if(code_mailboxUid_msgUid.Length != 3){
-                throw new ArgumentException("Invalid APPENDUID response value.","value");
+                throw new ArgumentException("Invalid APPENDUID response value.","r");
             }
 
             return new IMAP_t_orc_AppendUid(Convert.ToInt64(code_mailboxUid_msgUid[1]),Convert.ToInt32(code_mailboxUid_msgUid[2]));

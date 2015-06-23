@@ -4065,7 +4065,7 @@ namespace LumiSoft.Net.SMTP.Client
         /// <param name="localHost">Host name which is reported to SMTP server. Value null means local computer name is used.</param>
         /// <param name="host">Host name or IP address.</param>
         /// <param name="port">Host port.</param>
-        /// <param name="ssl">Specifies if connected via SSL.</param>
+        /// <param name="security">Specifies connection security.</param>
         /// <param name="userName">SMTP server user name. This value may be null, then authentication not used.</param>
         /// <param name="password">SMTP server password.</param>
         /// <param name="message">Mail message to send.</param>
@@ -4083,7 +4083,7 @@ namespace LumiSoft.Net.SMTP.Client
         /// <param name="localHost">Host name which is reported to SMTP server. Value null means local computer name is used.</param>
         /// <param name="host">Host name or IP address.</param>
         /// <param name="port">Host port.</param>
-        /// <param name="security">Specifies connection security.</param>
+        /// <param name="ssl">Specifies if connected via SSL.</param>
         /// <param name="userName">SMTP server user name. This value may be null, then authentication not used.</param>
         /// <param name="password">SMTP server password.</param>
         /// <param name="message">Mail message to send.</param>

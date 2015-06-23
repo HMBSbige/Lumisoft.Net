@@ -38,15 +38,15 @@ namespace LumiSoft.Net.IMAP
         #region static method Parse
 
         /// <summary>
-        /// Parses COPYUID optional response from string.
+        /// Parses COPYUID optional response from reader.
         /// </summary>
-        /// <param name="value">COPYUID optional response string.</param>
+        /// <param name="r">COPYUID optional response reader.</param>
         /// <returns>Returns COPYUID optional response.</returns>
-        /// <exception cref="ArgumentNullException">Is raised when <b>value</b> is null reference.</exception>
-        public new static IMAP_t_orc_CopyUid Parse(string value)
+        /// <exception cref="ArgumentNullException">Is raised when <b>r</b> is null reference.</exception>
+        public new static IMAP_t_orc_CopyUid Parse(StringReader r)
         {
-            if(value == null){
-                throw new ArgumentNullException("value");
+            if(r == null){
+                throw new ArgumentNullException("r");
             }
 
             /* RFC 4315 3.
@@ -59,12 +59,12 @@ namespace LumiSoft.Net.IMAP
                     mailbox with the stated UID(s).
             */
 
-            string[] code_mailboxUid_sourceSeqSet_targetSeqSet = value.Split(new char[]{' '},4);
+            string[] code_mailboxUid_sourceSeqSet_targetSeqSet = r.ReadParenthesized().Split(new char[]{' '},4);
             if(!string.Equals("COPYUID",code_mailboxUid_sourceSeqSet_targetSeqSet[0],StringComparison.InvariantCultureIgnoreCase)){
-                throw new ArgumentException("Invalid COPYUID response value.","value");
+                throw new ArgumentException("Invalid COPYUID response value.","r");
             }
             if(code_mailboxUid_sourceSeqSet_targetSeqSet.Length != 4){
-                throw new ArgumentException("Invalid COPYUID response value.","value");
+                throw new ArgumentException("Invalid COPYUID response value.","r");
             }
 
             return new IMAP_t_orc_CopyUid(
