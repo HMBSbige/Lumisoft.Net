@@ -39,7 +39,8 @@ namespace LumiSoft.Net.Mime.vCard
 
             if(version.StartsWith("3")){
                 // We need to escape CR LF COMMA SEMICOLON
-                value = value.Replace("\r","").Replace("\n","\\n").Replace(",","\\,").Replace(";","\\;");
+                //value = value.Replace("\r","").Replace("\n","\\n").Replace(",","\\,").Replace(";","\\;");
+                value = value.Replace("\r","").Replace("\n","\\n").Replace(",","\\,");
             }
             else{
                 value = QPEncode(charset.GetBytes(value));
