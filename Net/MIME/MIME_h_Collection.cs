@@ -427,7 +427,7 @@ namespace LumiSoft.Net.MIME
             }
 
             StringBuilder               currentHeader = new StringBuilder();
-            SmartStream.ReadLineAsyncOP readLineOP    = new SmartStream.ReadLineAsyncOP(new byte[32000],SizeExceededAction.ThrowException);
+            SmartStream.ReadLineAsyncOP readLineOP    = new SmartStream.ReadLineAsyncOP(new byte[84000],SizeExceededAction.ThrowException);
             while(true){                
                 stream.ReadLine(readLineOP,false);
                 if(readLineOP.Error != null){

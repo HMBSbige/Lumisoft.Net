@@ -52,7 +52,7 @@ namespace LumiSoft.Net.MIME
                 retVal = new MIME_b_Audio(defaultContentType.TypeWithSubtype);
             }
 
-            Net_Utils.StreamCopy(stream,retVal.EncodedStream,32000);
+            Net_Utils.StreamCopy(stream,retVal.EncodedStream,stream.LineBufferSize);
 
             return retVal;
         }

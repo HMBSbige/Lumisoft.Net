@@ -77,7 +77,7 @@ namespace LumiSoft.Net.MIME
             // We need to buffer all body data, otherwise we don't know if we have readed all data 
             // from stream.
             MemoryStream msBuffer = new MemoryStream();
-            Net_Utils.StreamCopy(stream,msBuffer,32000);
+            Net_Utils.StreamCopy(stream,msBuffer,stream.LineBufferSize);
             msBuffer.Position = 0;
 
             SmartStream parseStream = new SmartStream(msBuffer,true);

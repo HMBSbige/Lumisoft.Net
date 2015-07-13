@@ -56,7 +56,7 @@ namespace LumiSoft.Net.MIME
                 retVal = new MIME_b_Video(defaultContentType.TypeWithSubtype);
             }
 
-            Net_Utils.StreamCopy(stream,retVal.EncodedStream,32000);
+            Net_Utils.StreamCopy(stream,retVal.EncodedStream,stream.LineBufferSize);
 
             return retVal;
         }

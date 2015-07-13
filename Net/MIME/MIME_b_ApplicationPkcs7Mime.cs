@@ -46,7 +46,7 @@ namespace LumiSoft.Net.MIME
             }
 
             MIME_b_ApplicationPkcs7Mime retVal = new MIME_b_ApplicationPkcs7Mime();
-            Net_Utils.StreamCopy(stream,retVal.EncodedStream,32000);
+            Net_Utils.StreamCopy(stream,retVal.EncodedStream,stream.LineBufferSize);
 
             return retVal;
         }

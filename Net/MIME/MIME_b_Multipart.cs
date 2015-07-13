@@ -66,9 +66,10 @@ namespace LumiSoft.Net.MIME
                 /// <summary>
                 /// Default constructor.
                 /// </summary>
-                public _DataLine()
+                /// <param name="lineBufferSize">Line buffer size in bytes.</param>
+                public _DataLine(int lineBufferSize)
                 {
-                    m_pLineBuffer = new byte[32000];
+                    m_pLineBuffer = new byte[lineBufferSize];
                 }
 
 
@@ -141,7 +142,7 @@ namespace LumiSoft.Net.MIME
                 m_pStream  = stream;
                 m_Boundary = boundary;
 
-                m_pReadLineOP   = new SmartStream.ReadLineAsyncOP(new byte[32000],SizeExceededAction.ThrowException);
+                m_pReadLineOP   = new SmartStream.ReadLineAsyncOP(new byte[stream.LineBufferSize],SizeExceededAction.ThrowException);
                 m_pTextPreamble = new StringBuilder();
                 m_pTextEpilogue = new StringBuilder();
             }
@@ -306,7 +307,7 @@ namespace LumiSoft.Net.MIME
                                 
                 // Read line ahead, if none available. This is done for the boundary first line only.
                 if(m_pPreviousLine == null){
-                    m_pPreviousLine = new _DataLine();
+                    m_pPreviousLine = new _DataLine(m_pStream.LineBufferSize);
 
                     m_pStream.ReadLine(m_pReadLineOP,false);
                     if(m_pReadLineOP.Error != null){

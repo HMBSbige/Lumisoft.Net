@@ -53,7 +53,7 @@ namespace LumiSoft.Net.MIME
             }
 
             MIME_b_Unknown retVal = new MIME_b_Unknown(mediaType);
-            Net_Utils.StreamCopy(stream,retVal.EncodedStream,32000);
+            Net_Utils.StreamCopy(stream,retVal.EncodedStream,stream.LineBufferSize);
 
             return retVal;
         }

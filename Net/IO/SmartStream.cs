@@ -1035,7 +1035,7 @@ namespace LumiSoft.Net.IO
         private DateTime          m_LastActivity;
         private long              m_BytesReaded      = 0;
         private long              m_BytesWritten     = 0;
-        private int               m_BufferSize       = 32000;
+        private int               m_BufferSize       = 84000;
         private byte[]            m_pReadBuffer      = null;
         private int               m_ReadBufferOffset = 0;
         private int               m_ReadBufferCount  = 0;        
@@ -1448,7 +1448,7 @@ namespace LumiSoft.Net.IO
                 throw new ArgumentNullException("stream");
             }
 
-            byte[] buffer = new byte[32000];
+            byte[] buffer = new byte[m_BufferSize];
             while(true){
                 int readedCount = Read(buffer,0,buffer.Length);
                 // End of stream reached, we readed file sucessfully.
@@ -2695,6 +2695,21 @@ namespace LumiSoft.Net.IO
         public bool IsDisposed
         {
             get{ return m_IsDisposed; }
+        }
+
+        /// <summary>
+        /// Gets line buffer size in bytes.
+        /// </summary>
+        /// <exception cref="ObjectDisposedException">Is raised when this object is disposed and this property is accessed.</exception>
+        public int LineBufferSize
+        {
+            get{ 
+                if(m_IsDisposed){
+                    throw new ObjectDisposedException("SmartStream");
+                }
+
+                return m_BufferSize; 
+            }
         }
 
 
