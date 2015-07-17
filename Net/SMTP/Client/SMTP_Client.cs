@@ -4390,7 +4390,8 @@ namespace LumiSoft.Net.SMTP.Client
 
                 // Search AUTH entry.
                 foreach(string feature in this.EsmtpFeatures){
-                    if(feature.ToUpper().StartsWith(SMTP_ServiceExtensions.AUTH)){
+                    string featureName = feature.Split(' ')[0];
+                    if(string.Equals(featureName,SMTP_ServiceExtensions.AUTH,StringComparison.InvariantCultureIgnoreCase)){
                         // Remove AUTH<SP> and split authentication methods.
                         return feature.Substring(4).Trim().Split(' ');
                     }
