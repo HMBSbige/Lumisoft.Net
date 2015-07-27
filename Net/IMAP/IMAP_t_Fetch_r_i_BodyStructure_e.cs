@@ -81,21 +81,25 @@ namespace LumiSoft.Net.IMAP
                 string retVal = "";
 
                 if(m_pParent == null){
-                    retVal = "1";
+                    retVal = "";
                 }
                 else{
+                    // Multipart main entity pars specifier is "", first child starts from "1".
+
                     IMAP_t_Fetch_r_i_BodyStructure_e_Multipart currentParent = m_pParent;
                     while(currentParent != null){
                         int index = currentParent.IndexOfBodyPart(this) + 1;
 
-                        retVal = "." + index.ToString() + retVal;
+                        if(string.IsNullOrEmpty(retVal)){
+                            retVal = index.ToString();
+                        }
+                        else{
+                            retVal = "." + index.ToString() + retVal;
+                        }
 
                         // Move <--- left upper parent.
                         currentParent = currentParent.m_pParent;
                     }
-
-                    // multipart message always starts with "1." and childs after.
-                    retVal = "1" + retVal;
                 }
 
                 return retVal;
