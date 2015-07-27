@@ -165,6 +165,38 @@ namespace LumiSoft.Net.IMAP
             get{ return GetAttachments(false); }
         }
 
+        /// <summary>
+        /// Gets first text/plain body entity, returns null if no such entity.
+        /// </summary>
+        public IMAP_t_Fetch_r_i_BodyStructure_e_SinglePart BodyTextEntity
+        {
+            get{ 
+                foreach(IMAP_t_Fetch_r_i_BodyStructure_e e in this.AllEntities){
+                    if(string.Equals(e.ContentType.TypeWithSubtype,MIME_MediaTypes.Text.plain,StringComparison.InvariantCultureIgnoreCase)){
+                        return (IMAP_t_Fetch_r_i_BodyStructure_e_SinglePart)e;
+                    }
+                }
+
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets first text/html body entity, returns null if no such entity.
+        /// </summary>
+        public IMAP_t_Fetch_r_i_BodyStructure_e_SinglePart BodyTextHtmlEntity
+        {
+            get{ 
+                foreach(IMAP_t_Fetch_r_i_BodyStructure_e e in this.AllEntities){
+                    if(string.Equals(e.ContentType.TypeWithSubtype,MIME_MediaTypes.Text.html,StringComparison.InvariantCultureIgnoreCase)){
+                        return (IMAP_t_Fetch_r_i_BodyStructure_e_SinglePart)e;
+                    }
+                }
+
+                return null;
+            }
+        }
+
         #endregion
     }
 }
