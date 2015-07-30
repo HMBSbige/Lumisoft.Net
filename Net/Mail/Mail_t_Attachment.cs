@@ -155,7 +155,7 @@ namespace LumiSoft.Net.Mail
 
             if(m_ZipCompress){
                 #if NET20 || NET35|| NET40
-                    throw new InvalidOperationException("Not supported framework version lower than 4.5.");
+                    throw new InvalidOperationException("Not supported lower framework version than 4.5.");
                 #else
                     MemoryStreamEx retVal = new MemoryStreamEx();
 
