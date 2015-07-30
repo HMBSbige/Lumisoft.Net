@@ -339,7 +339,7 @@ namespace LumiSoft.Net.MIME
                 string   paramName  = name_value[0].Trim();
                 string   paramValue = null;
                 if(name_value.Length == 2){
-                    paramValue = TextUtils.UnQuoteString(name_value[1].Trim());
+                    paramValue = TextUtils.UnQuoteString(MIME_Utils.UnfoldHeader(name_value[1].Trim()));
                 }
                 // Valueless parameter.
                 //else{
