@@ -154,18 +154,22 @@ namespace LumiSoft.Net.Mail
             }
 
             if(m_ZipCompress){
-                MemoryStreamEx retVal = new MemoryStreamEx();
+                #if NET20 || NET35|| NET40
+                    throw new InvalidOperationException("Not supposrted framework version lower than 4.5.");
+                #else
+                    MemoryStreamEx retVal = new MemoryStreamEx();
 
-                using(ZipArchive archive = new ZipArchive(retVal,ZipArchiveMode.Create)){
-                    ZipArchiveEntry entry = archive.CreateEntry(m_Name,CompressionLevel.Optimal);
-                    using(Stream zipStream = entry.Open()){
-                        Net_Utils.StreamCopy(m_pStream,zipStream,64000);
+                    using(ZipArchive archive = new ZipArchive(retVal,ZipArchiveMode.Create)){
+                        ZipArchiveEntry entry = archive.CreateEntry(m_Name,CompressionLevel.Optimal);
+                        using(Stream zipStream = entry.Open()){
+                            Net_Utils.StreamCopy(m_pStream,zipStream,64000);
+                        }
                     }
-                }
-                retVal.Position = 0;
-                CloseStream();
+                    retVal.Position = 0;
+                    CloseStream();
 
-                return retVal;
+                    return retVal;
+                #endif
             }
 
             return m_pStream;
