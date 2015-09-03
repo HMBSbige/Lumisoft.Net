@@ -86,18 +86,20 @@ namespace LumiSoft.Net.IMAP
                 else{
                     // Multipart main entity pars specifier is "", first child starts from "1".
 
+                    IMAP_t_Fetch_r_i_BodyStructure_e           currentItem   = this;
                     IMAP_t_Fetch_r_i_BodyStructure_e_Multipart currentParent = m_pParent;
                     while(currentParent != null){
-                        int index = currentParent.IndexOfBodyPart(this) + 1;
+                        int index = currentParent.IndexOfBodyPart(currentItem) + 1;
 
                         if(string.IsNullOrEmpty(retVal)){
                             retVal = index.ToString();
                         }
                         else{
-                            retVal = "." + index.ToString() + retVal;
+                            retVal = index.ToString() + "." + retVal;
                         }
 
                         // Move <--- left upper parent.
+                        currentItem   = currentParent;
                         currentParent = currentParent.m_pParent;
                     }
                 }
