@@ -587,7 +587,7 @@ namespace LumiSoft.Net.IMAP.Server
                     }
                     catch(Exception x){                     
                         m_pImap.OnError(x);
-                         m_IsSending = false;
+                        m_IsSending = false;
                     }
                 };
 
