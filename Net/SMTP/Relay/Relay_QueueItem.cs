@@ -11,6 +11,7 @@ namespace LumiSoft.Net.SMTP.Relay
     public class Relay_QueueItem
     {
         private Relay_Queue     m_pQueue            = null;
+        private Relay_SmartHost m_pTargetServer     = null;
         private string          m_From              = "";
         private string          m_EnvelopeID        = null;
         private SMTP_DSN_Ret    m_DSN_Ret           = SMTP_DSN_Ret.NotSpecified;
@@ -25,6 +26,7 @@ namespace LumiSoft.Net.SMTP.Relay
         /// Default constructor.
         /// </summary>
         /// <param name="queue">Item owner queue.</param>
+        /// <param name="targetServer">Gets server where to send message. Value null means target server will be resolved by relay server.</param>
         /// <param name="from">Sender address.</param>
         /// <param name="envelopeID">Envelope ID_(MAIL FROM: ENVID).</param>
         /// <param name="ret">Specifies what parts of message are returned in DSN report.</param>
@@ -34,9 +36,10 @@ namespace LumiSoft.Net.SMTP.Relay
         /// <param name="messageID">Message ID.</param>
         /// <param name="message">Raw mime message. Message reading starts from current position.</param>
         /// <param name="tag">User data.</param>
-        internal Relay_QueueItem(Relay_Queue queue,string from,string envelopeID,SMTP_DSN_Ret ret,string to,string originalRecipient,SMTP_DSN_Notify notify,string messageID,Stream message,object tag)
+        internal Relay_QueueItem(Relay_Queue queue,Relay_SmartHost targetServer,string from,string envelopeID,SMTP_DSN_Ret ret,string to,string originalRecipient,SMTP_DSN_Notify notify,string messageID,Stream message,object tag)
         {
             m_pQueue            = queue;
+            m_pTargetServer     = targetServer;
             m_From              = from;
             m_EnvelopeID        = envelopeID;
             m_DSN_Ret           = ret;
@@ -57,6 +60,14 @@ namespace LumiSoft.Net.SMTP.Relay
         public Relay_Queue Queue
         {
             get{ return m_pQueue; }
+        }
+
+        /// <summary>
+        /// Gets server where to send message. Value null means target server will be resolved by relay server.
+        /// </summary>
+        public Relay_SmartHost TargetServer
+        {
+            get{ return m_pTargetServer; }
         }
 
         /// <summary>

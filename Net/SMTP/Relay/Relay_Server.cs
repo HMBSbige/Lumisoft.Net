@@ -265,7 +265,13 @@ namespace LumiSoft.Net.SMTP.Relay
                         }
                         // Create new session for queued relay item.
                         else{
-                            if(m_RelayMode == Relay_Mode.Dns){
+                            // Relay item has relay target server specified.
+                            if(item.TargetServer != null){
+                                Relay_Session session = new Relay_Session(this,item,new Relay_SmartHost[]{item.TargetServer});
+                                m_pSessions.Add(session);
+                                ThreadPool.QueueUserWorkItem(new WaitCallback(session.Start));
+                            }
+                            else if(m_RelayMode == Relay_Mode.Dns){
                                 Relay_Session session = new Relay_Session(this,item);
                                 m_pSessions.Add(session);
                                 ThreadPool.QueueUserWorkItem(new WaitCallback(session.Start));
