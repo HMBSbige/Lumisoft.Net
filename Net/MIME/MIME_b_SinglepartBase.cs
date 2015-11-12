@@ -183,7 +183,10 @@ namespace LumiSoft.Net.MIME
                 return new QuotedPrintableStream(new SmartStream(m_pEncodedDataStream,false),FileAccess.Read);
             }
             else if(transferEncoding == MIME_TransferEncodings.Base64){
-                return new Base64Stream(m_pEncodedDataStream,false,true,FileAccess.Read);
+                Base64Stream retVal = new Base64Stream(m_pEncodedDataStream,false,true,FileAccess.Read);
+                retVal.IgnoreInvalidPadding = true;
+
+                return retVal;
             }            
             else if(transferEncoding == MIME_TransferEncodings.Binary){
                 return new ReadWriteControlledStream(m_pEncodedDataStream,FileAccess.Read);
