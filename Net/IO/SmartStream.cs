@@ -428,9 +428,6 @@ namespace LumiSoft.Net.IO
             /// </summary>
             private void OnCompleted()
             {
-                if(m_IsDisposed){
-                    return;
-                }
                 if(m_IsCompleted){
                     return;
                 }
@@ -780,9 +777,6 @@ namespace LumiSoft.Net.IO
             /// </summary>
             private void OnCompleted()
             {
-                if(m_IsDisposed){
-                    return;
-                }
                 if(m_IsCompleted){
                     return;
                 }
