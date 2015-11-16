@@ -415,7 +415,7 @@ namespace LumiSoft.Net.AUTH
 
             StringBuilder authData = new StringBuilder();
             if(addAuthMethod){
-                authData.Append("digest ");
+                authData.Append("Digest ");
             }
             authData.Append("realm=\"" + m_Realm + "\",");
             authData.Append("username=\"" + m_UserName + "\",");
@@ -424,7 +424,7 @@ namespace LumiSoft.Net.AUTH
                 authData.Append("uri=\"" + m_Uri + "\",");
             }
             if(!string.IsNullOrEmpty(m_Qop)){
-                authData.Append("qop=\"" + m_Qop + "\",");
+                authData.Append("qop=" + m_Qop + ",");
             }
             // nc value must be specified only if qop is present.
             if(!string.IsNullOrEmpty(m_Qop)){
