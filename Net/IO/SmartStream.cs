@@ -121,27 +121,21 @@ namespace LumiSoft.Net.IO
                 if(m_IsDisposed){
                     return;
                 }
-
-                try{
-                    if(x != null){
-                        m_pException = x;
+            
+                if(x != null){
+                    m_pException = x;
+                    OnCompleted();
+                }
+                // We reached end of stream, no more data.
+                else if(m_pOwner.BytesInReadBuffer == 0){
+                    OnCompleted();
+                }
+                // Continue line reading.
+                else{
+                    if(DoLineReading(true)){
                         OnCompleted();
-                    }
-                    // We reached end of stream, no more data.
-                    else if(m_pOwner.BytesInReadBuffer == 0){
-                        OnCompleted();
-                    }
-                    // Continue line reading.
-                    else{
-                        if(DoLineReading(true)){
-                            OnCompleted();
-                        }
                     }
                 }
-                catch(Exception ex){
-                    m_pException = ex;
-                    OnCompleted();
-                }                
             }
 
             #endregion
@@ -428,10 +422,6 @@ namespace LumiSoft.Net.IO
             /// </summary>
             private void OnCompleted()
             {
-                if(m_IsCompleted){
-                    return;
-                }
-
                 m_IsCompleted = true;
 
                 if(this.Completed != null){
@@ -777,10 +767,6 @@ namespace LumiSoft.Net.IO
             /// </summary>
             private void OnCompleted()
             {
-                if(m_IsCompleted){
-                    return;
-                }
-
                 m_IsCompleted = true;
 
                 if(this.Completed != null){
