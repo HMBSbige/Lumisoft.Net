@@ -1075,16 +1075,51 @@ namespace LumiSoft.Net.SMTP.Client
         /// don't support any of the server authentication mechanisms.</exception>
         public AUTH_SASL_Client AuthGetStrongestMethod(string userName,string password)
         {
+            return AuthGetStrongestMethod(null,userName,password);
+        }
+
+        /// <summary>
+        /// Gets strongest authentication method which we can support from SMTP server.
+        /// Preference order DIGEST-MD5 -> CRAM-MD5 -> LOGIN -> PLAIN.
+        /// </summary>
+        /// <param name="domain">Domain name. Required by some auth methods like NTLM.</param>
+        /// <param name="userName">User name.</param>
+        /// <param name="password">User password.</param>
+        /// <returns>Returns authentication method.</returns>
+        /// <exception cref="ObjectDisposedException">Is raised when this object is disposed and this method is accessed.</exception>
+        /// <exception cref="InvalidOperationException">Is raised when SMTP client is not connected .</exception>
+        /// <exception cref="ArgumentNullException">Is raised when <b>userName</b> or <b>password</b> is null reference.</exception>
+        /// <exception cref="ArgumentException">Is raised when any of the arguments has invalid value.</exception>
+        /// <exception cref="NotSupportedException">Is raised when SMTP server won't support authentication or we 
+        /// don't support any of the server authentication mechanisms.</exception>
+        public AUTH_SASL_Client AuthGetStrongestMethod(string domain,string userName,string password)
+        {
             if(this.IsDisposed){
                 throw new ObjectDisposedException(this.GetType().Name);
             }
             if(!this.IsConnected){
 				throw new InvalidOperationException("You must connect first.");
 			}
+            if(userName == null){
+                throw new ArgumentNullException("userName");
+            }
+            if(password == null){
+                throw new ArgumentNullException("userName");
+            }
 
             List<string> authMethods = new List<string>(this.SaslAuthMethods);
             if(authMethods.Count == 0){
                 throw new NotSupportedException("SMTP server does not support authentication.");
+            }
+            else if(authMethods.Contains("NTLM") && (!string.IsNullOrEmpty(domain) || userName.IndexOf('\\') > -1)){
+                if(!string.IsNullOrEmpty(domain)){
+                    return new AUTH_SASL_Client_Ntlm(domain,userName, password);
+                }
+                else{
+                    string[] domainUsername = userName.Split('\\');
+
+                    return new AUTH_SASL_Client_Ntlm(domainUsername[0],domainUsername[1],password);
+                }
             }
             else if(authMethods.Contains("DIGEST-MD5")){
                 return new AUTH_SASL_Client_DigestMd5("SMTP",this.RemoteEndPoint.Address.ToString(),userName,password);
@@ -1110,7 +1145,7 @@ namespace LumiSoft.Net.SMTP.Client
         /// <summary>
         /// Sends AUTH command to SMTP server.
         /// </summary>
-        /// <param name="sasl">SASL authentication. You can use method <see cref="AuthGetStrongestMethod"/> to get strongest supported authentication.</param>
+        /// <param name="sasl">SASL authentication. You can use method <see cref="AuthGetStrongestMethod(string,string)"/> to get strongest supported authentication.</param>
         /// <exception cref="ObjectDisposedException">Is raised when this object is disposed and this method is accessed.</exception>
         /// <exception cref="InvalidOperationException">Is raised when SMTP client is not connected or is already authenticated.</exception>
         /// <exception cref="SMTP_ClientException">Is raised when SMTP server returns error.</exception>
@@ -1167,7 +1202,7 @@ namespace LumiSoft.Net.SMTP.Client
             /// <summary>
             /// Default constructor.
             /// </summary>
-            /// <param name="sasl">SASL authentication. You can use method <see cref="AuthGetStrongestMethod"/> to get strongest supported authentication.</param>
+            /// <param name="sasl">SASL authentication. You can use method <see cref="AuthGetStrongestMethod(string,string)"/> to get strongest supported authentication.</param>
             /// <exception cref="ArgumentNullException">Is raised when <b>sasl</b> is null reference.</exception>
             public AuthAsyncOP(AUTH_SASL_Client sasl)
             {
