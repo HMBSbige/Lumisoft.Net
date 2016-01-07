@@ -93,7 +93,7 @@ namespace LumiSoft.Net.SIP.Message
             if(word == null){
                 throw new SIP_ParseException("Invalid 'warning-value' value, warn-text is missing !");
             }
-            this.Agent = TextUtils.UnQuoteString(word);
+            this.Text = TextUtils.UnQuoteString(word);
         }
 
         #endregion
