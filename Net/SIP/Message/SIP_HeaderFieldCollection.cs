@@ -75,7 +75,7 @@ namespace LumiSoft.Net.SIP.Message
                 h.Value = value;
             }
             else{
-                this.Add(fieldName,value);
+                this.Add(GetheaderField(fieldName,value));
             }
         }
 
