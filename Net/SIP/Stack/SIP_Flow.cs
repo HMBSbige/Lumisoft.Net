@@ -85,7 +85,7 @@ namespace LumiSoft.Net.SIP.Stack
         /// <param name="stack">Owner stack.</param>
         /// <param name="session">TCP session.</param>
         /// <exception cref="ArgumentNullException">Is raised when <b>stack</b> or <b>session</b> is null reference.</exception>
-        internal SIP_Flow(SIP_Stack stack,TCP_Session session)
+        internal SIP_Flow(SIP_Stack stack,TCP_ServerSession session)
         {
             if(stack == null){
                 throw new ArgumentNullException("stack");
@@ -106,7 +106,17 @@ namespace LumiSoft.Net.SIP.Stack
             m_ID           = m_pLocalEP.ToString() + "-" + m_pRemoteEP.ToString() + "-" + m_Transport;
             m_pMessage     = new MemoryStream();
 
+            // Dispose flow when TCP server session closed.
+            session.Disposed += new EventHandler(delegate(object s,EventArgs e){
+                Dispose();
+            });
+
             BeginReadHeader();
+        }
+
+        private void Session_Disposed(object sender,EventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
 
