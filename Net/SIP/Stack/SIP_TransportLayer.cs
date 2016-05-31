@@ -93,7 +93,7 @@ namespace LumiSoft.Net.SIP.Stack
                     if(m_IsDisposed){
                         return;
                     }
-                
+              
                     foreach(SIP_Flow flow in this.Flows){
                         try{
                             if(flow.LastActivity.AddSeconds(m_IdelTimeout) < DateTime.Now){
