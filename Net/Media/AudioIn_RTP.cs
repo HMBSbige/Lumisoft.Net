@@ -194,6 +194,8 @@ namespace LumiSoft.Net.Media
                 m_pWaveIn.Dispose();
                 m_pWaveIn = null;
             }
+
+            m_IsRunning = false;
         }
 
         #endregion
