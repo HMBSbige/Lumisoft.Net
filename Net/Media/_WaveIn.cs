@@ -554,6 +554,7 @@ namespace LumiSoft.Net.Media
 
         #endregion
 
+        private object                       m_pLock         = new object();
         private bool                         m_IsDisposed    = false;
         private AudioInDevice                m_pInDevice     = null;
         private int                          m_SamplesPerSec = 8000;
@@ -565,7 +566,6 @@ namespace LumiSoft.Net.Media
         private Dictionary<long,BufferItem>  m_pBuffers      = null;
         private waveInProc                   m_pWaveInProc   = null;
         private bool                         m_IsRecording   = false;
-        private object                       m_pLock         = new object();
             
         /// <summary>
         /// Default constructor.
@@ -642,21 +642,23 @@ namespace LumiSoft.Net.Media
             m_IsDisposed = true;
 
             try{
-                // If recording, we need to reset wav device first.
-                waveInReset(m_pWavDevHandle);
+                lock(m_pLock){
+                    // If recording, we need to reset wav device first.
+                    waveInReset(m_pWavDevHandle);
                 
-                // If there are unprepared wav headers, we need to unprepare these.
-                foreach(BufferItem item in m_pBuffers.Values){
-                    item.Dispose();
+                    // If there are unprepared wav headers, we need to unprepare these.
+                    foreach(BufferItem item in m_pBuffers.Values){
+                        item.Dispose();
+                    }
+                
+                    // Close input device.
+                    waveInClose(m_pWavDevHandle);
+
+                    m_pInDevice     = null;
+                    m_pWavDevHandle = IntPtr.Zero;
+
+                    this.AudioFrameReceived = null;
                 }
-                
-                // Close input device.
-                waveInClose(m_pWavDevHandle);
-
-                m_pInDevice     = null;
-                m_pWavDevHandle = IntPtr.Zero;
-
-                this.AudioFrameReceived = null;
             }
             catch{                
             }
@@ -734,11 +736,13 @@ namespace LumiSoft.Net.Media
                             return;
                         }
 
-                        BufferItem bufferItem = m_pBuffers[dwParam1.ToInt64()];
+                        lock(m_pLock){
+                            BufferItem bufferItem = m_pBuffers[dwParam1.ToInt64()];
                           
-                        OnAudioFrameReceived(bufferItem.EventArgs);
+                            OnAudioFrameReceived(bufferItem.EventArgs);
                                        
-                        bufferItem.Queue(true);
+                            bufferItem.Queue(true);
+                        }
                     }
                     catch(Exception x){
                         Console.WriteLine(x.ToString());
