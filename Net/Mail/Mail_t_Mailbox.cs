@@ -104,7 +104,7 @@ namespace LumiSoft.Net.Mail
                     return wordEncoder.Encode(m_DisplayName) + " " + "<" + m_Address + ">";
                 }
                 else{
-                    return TextUtils.QuoteString(m_DisplayName) + " " + "<" + m_Address + ">";
+                    return m_DisplayName + " " + "<" + m_Address + ">";
                 }
             }
         }
