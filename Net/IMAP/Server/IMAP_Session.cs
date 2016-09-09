@@ -199,6 +199,7 @@ namespace LumiSoft.Net.IMAP.Server
             private string       m_InitialCmdLine = null;
             private Encoding     m_pCharset       = null;
             private string       m_CmdLine        = null;
+            private int          m_MaxLiteralSize = 32000;
 
             /// <summary>
             /// Default constructor.
@@ -252,6 +253,10 @@ namespace LumiSoft.Net.IMAP.Server
                     SmartStream.ReadLineAsyncOP readLineOP = new SmartStream.ReadLineAsyncOP(new byte[32000],SizeExceededAction.JunkAndThrowException);
                     while(true){
                         #region Read literal string
+
+                        if(literalSize > m_MaxLiteralSize){
+                            throw new DataSizeExceededException();
+                        }
 
                         // Send "+ Continue".
                         m_pSession.WriteLine("+ Continue.");
@@ -314,7 +319,7 @@ namespace LumiSoft.Net.IMAP.Server
             #endregion
 
 
-            #region method EndsWithLiteralString
+            #region static method EndsWithLiteralString
 
             /// <summary>
             /// Cheks if specified value ends with IMAP literal string.
@@ -322,7 +327,7 @@ namespace LumiSoft.Net.IMAP.Server
             /// <param name="value">Data value.</param>
             /// <returns>Returns true if value ends with IMAP literal string, otherwise false.</returns>
             /// <exception cref="ArgumentNullException">Is raised when <b>value</b> is null reference.</exception>
-            private bool EndsWithLiteralString(string value)
+            public static bool EndsWithLiteralString(string value)
             {
                 if(value == null){
                     throw new ArgumentNullException("value");
@@ -356,6 +361,7 @@ namespace LumiSoft.Net.IMAP.Server
             }
 
             #endregion
+
 
             #region method GetLiteralSize
 
@@ -881,7 +887,7 @@ namespace LumiSoft.Net.IMAP.Server
                 
                     return false;
                 }
-                                
+                                                                
                 string[] cmd_args = Encoding.UTF8.GetString(op.Buffer,0,op.LineBytesInBuffer).Split(new char[]{' '},3);
                 if(cmd_args.Length < 2){
                     m_pResponseSender.SendResponseAsync(new IMAP_r_u_ServerStatus("BAD","Error: Command '" + op.LineUtf8 + "' not recognized."));
@@ -891,7 +897,7 @@ namespace LumiSoft.Net.IMAP.Server
                 string   cmdTag   = cmd_args[0];
                 string   cmd      = cmd_args[1].ToUpperInvariant();
                 string   args     = cmd_args.Length == 3 ? cmd_args[2] : "";
-        
+
                 // Log.
                 if(this.Server.Logger != null){
                     // Hide password from log.
@@ -902,6 +908,15 @@ namespace LumiSoft.Net.IMAP.Server
                         this.Server.Logger.AddRead(this.ID,this.AuthenticatedUserIdentity,op.BytesInBuffer,op.LineUtf8,this.LocalEndPoint,this.RemoteEndPoint);
                     }
                 }
+
+                // Command line continues(ends with IMAP literal-string), read while we have full command line.
+                // Skip APPEND command, we handle it specially.
+                if(_CmdReader.EndsWithLiteralString(args) && !string.Equals(cmd,"APPEND",StringComparison.InvariantCultureIgnoreCase)){
+                    _CmdReader cmdReader = new _CmdReader(this,args,Encoding.UTF8);            
+                    cmdReader.Start();
+
+                    args = cmdReader.CmdLine;
+                }                
 
                 if(cmd == "STARTTLS"){                    
                     STARTTLS(cmdTag,args);
@@ -4382,10 +4397,7 @@ namespace LumiSoft.Net.IMAP.Server
 
             #region Parse arguments
 
-            _CmdReader cmdReader = new _CmdReader(this,cmdText,Encoding.UTF8);            
-            cmdReader.Start();
-
-            StringReader r = new StringReader(cmdReader.CmdLine);
+            StringReader r = new StringReader(cmdText);
             
             // See if we have optional CHARSET argument.
             if(r.StartsWith("CHARSET",false)){
@@ -5202,7 +5214,7 @@ namespace LumiSoft.Net.IMAP.Server
 
         #endregion
                 
-
+        
         #region method WriteLine
 
         /// <summary>
