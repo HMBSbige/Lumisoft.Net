@@ -111,12 +111,17 @@ namespace LumiSoft.Net.RTP
                 throw new ArgumentException("Argument 'offset' value must be >= 0.");
             }
 
-            // Calculate packet body size in bytes.
-            int length = 0;
-            length += m_Sources.Length * 4;
+            byte[] leavingReasonBytes = new byte[0];
             if(!string.IsNullOrEmpty(m_LeavingReason)){
-                length++;
-                length += Encoding.UTF8.GetByteCount(m_LeavingReason);
+                leavingReasonBytes = Encoding.UTF8.GetBytes(m_LeavingReason);
+            }
+
+            // NOTE: Size in 32-bit(4 bytes) boundary, header not included.
+            int  length = 0;
+            length += m_Sources.Length;
+            if(!string.IsNullOrEmpty(m_LeavingReason)){
+                // 4 bytes for "length".
+                length += (int)Math.Ceiling((decimal)((4 + leavingReasonBytes.Length) / 4));
             }
 
             // V=2 P SC
