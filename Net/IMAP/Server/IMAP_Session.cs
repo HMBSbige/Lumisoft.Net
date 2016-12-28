@@ -2050,9 +2050,15 @@ namespace LumiSoft.Net.IMAP.Server
                 m_pResponseSender.SendResponseAsync(new IMAP_r_ServerStatus(cmdTag,"NO","Authentication required."));
 
                 return;
-            }
+            }            
 
             string folder = IMAP_Utils.DecodeMailbox(TextUtils.UnQuoteString(cmdText));
+
+            if(string.IsNullOrEmpty(folder)){
+                m_pResponseSender.SendResponseAsync(new IMAP_r_ServerStatus(cmdTag,"NO","Mailbox name must be specified."));
+
+                return;
+            }
             
             IMAP_e_Folder e = OnSubscribe(cmdTag,folder,new IMAP_r_ServerStatus(cmdTag,"OK","SUBSCRIBE command completed."));
             
