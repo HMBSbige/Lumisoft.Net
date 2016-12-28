@@ -165,12 +165,17 @@ namespace LumiSoft.Net.RTP
             if(m_IsDisposed){
                 throw new ObjectDisposedException(this.GetType().Name);
             }
-
-            // Generate BYE packet(s).
+                        
             RTCP_CompoundPacket compundPacket = new RTCP_CompoundPacket();
+            // RTCP compound packet required SR or RR packet.
             RTCP_Packet_RR rr = new RTCP_Packet_RR();
             rr.SSRC = m_pRtcpSource.SSRC;
             compundPacket.Packets.Add(rr);
+            // RTCP compound packet required SDES with CNAME packet.
+            RTCP_Packet_SDES sdes = new RTCP_Packet_SDES();
+            sdes.Chunks.Add(new RTCP_Packet_SDES_Chunk(m_pRtcpSource.SSRC,m_pSession.LocalParticipant.CNAME));
+            compundPacket.Packets.Add(sdes);
+            // Generate BYE packet(s).
             int sourcesProcessed = 0;
             while(sourcesProcessed < m_pLocalSources.Count){
                 uint[] sources = new uint[Math.Min(m_pLocalSources.Count - sourcesProcessed,31)];
