@@ -29,7 +29,6 @@ namespace LumiSoft.Net.IO
             private SmartStream        m_pOwner          = null;
             private byte[]             m_pBuffer         = null;
             private SizeExceededAction m_ExceededAction  = SizeExceededAction.JunkAndThrowException;
-            private bool               m_CRLFLinesOnly   = true;
             private int                m_BytesInBuffer   = 0;
             private int                m_LastByte        = -1;
             private Exception          m_pException      = null;
@@ -187,7 +186,7 @@ namespace LumiSoft.Net.IO
 
                         // We have LF line.
                         if(b == '\n'){
-                            if(!m_CRLFLinesOnly || m_CRLFLinesOnly && m_LastByte == '\r'){
+                            if(!m_pOwner.CRLFLines || m_pOwner.CRLFLines  && m_LastByte == '\r'){
                                 m_IsCompleted = true;
                                 return true;
                             }                   
@@ -1054,6 +1053,7 @@ namespace LumiSoft.Net.IO
         private int               m_ReadBufferCount  = 0;        
         private BufferReadAsyncOP m_pReadBufferOP    = null;
         private Encoding          m_pEncoding        = Encoding.Default;
+        private bool              m_CRLFLines        = true;
 
         /// <summary>
         /// Default constructor.
@@ -1129,7 +1129,6 @@ namespace LumiSoft.Net.IO
                 byte[]             buffer         = op.Buffer;
                 int                bytesInBuffer  = 0;
                 int                lastByte       = -1;
-                bool               CRLFLinesOnly  = true;
                 int                lineBuffSize   = buffer.Length;
                 SizeExceededAction exceededAction = op.SizeExceededAction;
                 Exception          exception      = null;
@@ -1165,7 +1164,7 @@ namespace LumiSoft.Net.IO
 
                         // We have LF line.
                         if(b == '\n'){
-                            if(!CRLFLinesOnly || CRLFLinesOnly && lastByte == '\r'){
+                            if(!m_CRLFLines || m_CRLFLines && lastByte == '\r'){
                                 break;
                             }
                         }
@@ -2850,6 +2849,16 @@ namespace LumiSoft.Net.IO
                 m_pEncoding = value;
             }
         }
+
+        /// <summary>
+        /// Gets or sets if only CRLF lines accepted. If false LF lines accepted. 
+        /// </summary>
+        public bool CRLFLines
+        {
+                get{ return m_CRLFLines; }
+
+                set { m_CRLFLines = value; }
+            }
 
 
         /// <summary>
