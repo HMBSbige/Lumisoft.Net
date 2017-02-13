@@ -52,19 +52,19 @@ namespace LumiSoft.Net.UPnP
             // Set up namespace manager for XPath   
             XmlNamespaceManager ns = new XmlNamespaceManager(xml.NameTable);   
             ns.AddNamespace("n",xml.ChildNodes[1].NamespaceURI);
-
-            m_BaseUrl          = xml.SelectSingleNode("n:root/n:URLBase",ns).InnerText;
-            m_DeviceType       = xml.SelectSingleNode("n:root/n:device/n:deviceType",ns).InnerText;
-            m_FriendlyName     = xml.SelectSingleNode("n:root/n:device/n:friendlyName",ns).InnerText;
-            m_Manufacturer     = xml.SelectSingleNode("n:root/n:device/n:manufacturer",ns).InnerText;
-            m_ManufacturerUrl  = xml.SelectSingleNode("n:root/n:device/n:manufacturerURL",ns).InnerText;
-            m_ModelDescription = xml.SelectSingleNode("n:root/n:device/n:modelDescription",ns).InnerText;
-            m_ModelName        = xml.SelectSingleNode("n:root/n:device/n:modelName",ns).InnerText;
-            m_ModelNumber      = xml.SelectSingleNode("n:root/n:device/n:modelNumber",ns).InnerText;
-            m_ModelUrl         = xml.SelectSingleNode("n:root/n:device/n:modelURL",ns).InnerText;
-            m_SerialNumber     = xml.SelectSingleNode("n:root/n:device/n:serialNumber",ns).InnerText;
-            m_UDN              = xml.SelectSingleNode("n:root/n:device/n:UDN",ns).InnerText;
-            m_PresentationUrl  = xml.SelectSingleNode("n:root/n:device/n:presentationURL",ns).InnerText;
+            
+            m_BaseUrl          = xml.SelectSingleNode("n:root/n:URLBase",ns) != null ? xml.SelectSingleNode("n:root/n:URLBase",ns).InnerText : url.Substring(0,url.LastIndexOf("/"));
+            m_DeviceType       = xml.SelectSingleNode("n:root/n:device/n:deviceType",ns) != null ? xml.SelectSingleNode("n:root/n:device/n:deviceType",ns).InnerText : "";
+            m_FriendlyName     = xml.SelectSingleNode("n:root/n:device/n:friendlyName",ns) != null ? xml.SelectSingleNode("n:root/n:device/n:friendlyName",ns).InnerText : "";
+            m_Manufacturer     = xml.SelectSingleNode("n:root/n:device/n:manufacturer",ns) != null ? xml.SelectSingleNode("n:root/n:device/n:manufacturer",ns).InnerText : "";
+            m_ManufacturerUrl  = xml.SelectSingleNode("n:root/n:device/n:manufacturerURL",ns) != null ? xml.SelectSingleNode("n:root/n:device/n:manufacturerURL",ns).InnerText : "";
+            m_ModelDescription = xml.SelectSingleNode("n:root/n:device/n:modelDescription",ns) != null ? xml.SelectSingleNode("n:root/n:device/n:modelDescription",ns).InnerText : "";
+            m_ModelName        = xml.SelectSingleNode("n:root/n:device/n:modelName",ns) != null ? xml.SelectSingleNode("n:root/n:device/n:modelName",ns).InnerText : "";
+            m_ModelNumber      = xml.SelectSingleNode("n:root/n:device/n:modelNumber",ns) != null ? xml.SelectSingleNode("n:root/n:device/n:modelNumber",ns).InnerText : "";
+            m_ModelUrl         = xml.SelectSingleNode("n:root/n:device/n:modelURL",ns) != null ? xml.SelectSingleNode("n:root/n:device/n:modelURL",ns).InnerText : "";
+            m_SerialNumber     = xml.SelectSingleNode("n:root/n:device/n:serialNumber",ns) != null ? xml.SelectSingleNode("n:root/n:device/n:serialNumber",ns).InnerText : "";
+            m_UDN              = xml.SelectSingleNode("n:root/n:device/n:UDN",ns) != null ? xml.SelectSingleNode("n:root/n:device/n:UDN",ns).InnerText : "";
+            m_PresentationUrl  = xml.SelectSingleNode("n:root/n:device/n:presentationURL",ns) != null ? xml.SelectSingleNode("n:root/n:device/n:presentationURL",ns).InnerText : "";
         }
 
         #endregion
