@@ -4435,7 +4435,7 @@ namespace LumiSoft.Net.IMAP.Server
                         // Search sequence-number for that message.
                         int seqNo = m_pSelectedFolder.GetSeqNo(e.Value);
                         if(seqNo != -1){
-                            matchedValues.Add((int)e.Value);
+                            matchedValues.Add(seqNo);
                         }
                     }                    
                 });
