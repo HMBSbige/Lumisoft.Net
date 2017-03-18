@@ -16,6 +16,7 @@ namespace LumiSoft.Net.DNS.Client
         private DNS_ClientTransactionState m_State         = DNS_ClientTransactionState.WaitingForStart;
         private DateTime                   m_CreateTime;
         private Dns_Client                 m_pOwner        = null;
+        private IPAddress[]                m_pDnsServers   = null;
         private int                        m_ID            = 1;
         private string                     m_QName         = "";
         private DNS_QType                  m_QType         = 0;
@@ -27,24 +28,29 @@ namespace LumiSoft.Net.DNS.Client
         /// Default constructor.
         /// </summary>
         /// <param name="owner">Owner DNS client.</param>
+        /// <param name="dnsServers">DNS servers.</param>
         /// <param name="id">Transaction ID.</param>
         /// <param name="qtype">QTYPE value.</param>
         /// <param name="qname">QNAME value.</param>
         /// <param name="timeout">Timeout in milliseconds.</param>
         /// <exception cref="ArgumentNullException">Is raised when <b>owner</b> or <b>qname</b> is null reference.</exception>
-        internal DNS_ClientTransaction(Dns_Client owner,int id,DNS_QType qtype,string qname,int timeout)
+        internal DNS_ClientTransaction(Dns_Client owner,IPAddress[] dnsServers,int id,DNS_QType qtype,string qname,int timeout)
         {
             if(owner == null){
                 throw new ArgumentNullException("owner");
+            }
+            if(dnsServers == null){
+                throw new ArgumentNullException("dnsServers");
             }
             if(qname == null){
                 throw new ArgumentNullException("qname");
             }
 
-            m_pOwner = owner;
-            m_ID     = id;
-            m_QName  = qname;
-            m_QType  = qtype;
+            m_pOwner      = owner;
+            m_pDnsServers = dnsServers;
+            m_ID          = id;
+            m_QName       = qname;
+            m_QType       = qtype;
                         
             m_CreateTime    = DateTime.Now;
             m_pTimeoutTimer = new TimerEx(timeout);
@@ -143,11 +149,8 @@ namespace LumiSoft.Net.DNS.Client
                     int count = CreateQuery(buffer,m_ID,m_QName,m_QType,1);
   
                     // Send parallel query to DNS server(s).
-                    foreach(string server in Dns_Client.DnsServers){
-                        if(Net_Utils.IsIPAddress(server)){
-                            IPAddress ip = IPAddress.Parse(server);
-                            m_pOwner.Send(ip,buffer,count);
-                        }
+                    foreach(IPAddress server in m_pDnsServers){
+                        m_pOwner.Send(server,buffer,count);
                     }
 
                     m_pTimeoutTimer.Start();

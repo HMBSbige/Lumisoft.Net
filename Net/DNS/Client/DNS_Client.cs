@@ -168,9 +168,37 @@ namespace LumiSoft.Net.DNS.Client
         /// <remarks>Creates asynchronous(non-blocking) DNS transaction. Call <see cref="DNS_ClientTransaction.Start"/> to start transaction.
         /// It is allowd to create multiple conccurent transactions.</remarks>
         public DNS_ClientTransaction CreateTransaction(DNS_QType queryType,string queryText,int timeout)
+        {
+            List<IPAddress> dnsServers = new List<IPAddress>();
+            foreach(string server in Dns_Client.DnsServers){
+                if(Net_Utils.IsIPAddress(server)){
+                    dnsServers.Add(IPAddress.Parse(server));
+                 }
+            }
+
+            return CreateTransaction(dnsServers.ToArray(),queryType,queryText,timeout);
+        }
+
+        /// <summary>
+        /// Creates new DNS client transaction.
+        /// </summary>
+        /// <param name="dnsServers">DNS servers.</param>
+        /// <param name="queryType">Query type.</param>
+        /// <param name="queryText">Query text. It depends on queryType.</param>
+        /// <param name="timeout">Transaction timeout in milliseconds. DNS default value is 2000, value 0 means no timeout - this is not suggested.</param>
+        /// <returns>Returns DNS client transaction.</returns>
+        /// <exception cref="ObjectDisposedException">Is raised when this object is disposed and and this method is accessed.</exception>
+        /// <exception cref="ArgumentNullException">Is raised when <b>dnsServers</b> or <b>queryText</b> is null reference.</exception>
+        /// <exception cref="ArgumentException">Is raised when any of the arguments has invalid value.</exception>
+        /// <remarks>Creates asynchronous(non-blocking) DNS transaction. Call <see cref="DNS_ClientTransaction.Start"/> to start transaction.
+        /// It is allowd to create multiple conccurent transactions.</remarks>
+        public DNS_ClientTransaction CreateTransaction(IPAddress[] dnsServers,DNS_QType queryType,string queryText,int timeout)
         {   
             if(m_IsDisposed){
                 throw new ObjectDisposedException(this.GetType().Name);
+            }
+            if(dnsServers == null){
+                throw new ArgumentNullException("dnsServers");
             }
             if(queryText == null){
                 throw new ArgumentNullException("queryText");
@@ -232,7 +260,7 @@ namespace LumiSoft.Net.DNS.Client
                 }
             }
 
-            DNS_ClientTransaction retVal = new DNS_ClientTransaction(this,transactionID,queryType,queryText,timeout);
+            DNS_ClientTransaction retVal = new DNS_ClientTransaction(this,dnsServers,transactionID,queryType,queryText,timeout);
             retVal.StateChanged += delegate(object s1,EventArgs<DNS_ClientTransaction> e1){
                 if(retVal.State == DNS_ClientTransactionState.Disposed){
                     lock(m_pTransactions){
@@ -256,7 +284,7 @@ namespace LumiSoft.Net.DNS.Client
 		/// </summary>
 		/// <param name="queryText">Query text. It depends on queryType.</param>
 		/// <param name="queryType">Query type.</param>
-		/// <returns>Returns DSN server response.</returns>
+		/// <returns>Returns DNS server response.</returns>
         /// <exception cref="ObjectDisposedException">Is raised when this object is disposed and and this method is accessed.</exception>
         /// <exception cref="ArgumentNullException">Is raised when <b>queryText</b> is null.</exception>
 		public DnsServerResponse Query(string queryText,DNS_QType queryType)
@@ -264,19 +292,44 @@ namespace LumiSoft.Net.DNS.Client
             return Query(queryText,queryType,2000);
         }
 
-		/// <summary>
+        /// <summary>
 		/// Queries server with specified query.
 		/// </summary>
 		/// <param name="queryText">Query text. It depends on queryType.</param>
 		/// <param name="queryType">Query type.</param>
         /// <param name="timeout">Query timeout in milli seconds.</param>
-		/// <returns>Returns DSN server response.</returns>
+		/// <returns>Returns DNS server response.</returns>
         /// <exception cref="ObjectDisposedException">Is raised when this object is disposed and and this method is accessed.</exception>
         /// <exception cref="ArgumentNullException">Is raised when <b>queryText</b> is null.</exception>
 		public DnsServerResponse Query(string queryText,DNS_QType queryType,int timeout)
 		{
+            List<IPAddress> dnsServers = new List<IPAddress>();
+            foreach(string server in Dns_Client.DnsServers){
+                if(Net_Utils.IsIPAddress(server)){
+                    dnsServers.Add(IPAddress.Parse(server));
+                 }
+            }
+
+            return Query(dnsServers.ToArray(),queryText,queryType,timeout);
+        }
+
+		/// <summary>
+		/// Queries DNS server with specified query.
+		/// </summary>
+        /// <param name="dnsServers">DNS servers.</param>
+		/// <param name="queryText">Query text. It depends on queryType.</param>
+		/// <param name="queryType">Query type.</param>
+        /// <param name="timeout">Query timeout in milli seconds.</param>
+		/// <returns>Returns DNS server response.</returns>
+        /// <exception cref="ObjectDisposedException">Is raised when this object is disposed and and this method is accessed.</exception>
+        /// <exception cref="ArgumentNullException">Is raised when <b>dnsServers</b> or <b>queryText</b> is null.</exception>
+		public DnsServerResponse Query(IPAddress[] dnsServers,string queryText,DNS_QType queryType,int timeout)
+		{
             if(m_IsDisposed){
                 throw new ObjectDisposedException(this.GetType().Name);
+            }
+            if(dnsServers == null){
+                throw new ArgumentNullException("dnsServers");
             }
             if(queryText == null){
                 throw new ArgumentNullException("queryText");
@@ -285,7 +338,7 @@ namespace LumiSoft.Net.DNS.Client
             DnsServerResponse retVal = null;
             ManualResetEvent  wait   = new ManualResetEvent(false);
 
-            DNS_ClientTransaction transaction = CreateTransaction(queryType,queryText,timeout);            
+            DNS_ClientTransaction transaction = CreateTransaction(dnsServers,queryType,queryText,timeout);            
             transaction.Timeout += delegate(object s,EventArgs e){
                 if(wait != null){
                     wait.Set();
