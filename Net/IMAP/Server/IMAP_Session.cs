@@ -5758,7 +5758,7 @@ namespace LumiSoft.Net.IMAP.Server
                     retVal.Append(" \"" + entity.ContentType.SubType + "\"");
                 }
                 else{
-                    retVal.Append(" NIL");
+                    retVal.Append(" \"plain\"");
                 }
 
 				retVal.Append(")");
@@ -5774,7 +5774,7 @@ namespace LumiSoft.Net.IMAP.Server
 					retVal.Append("\"" + entity.ContentType.Type + "\"");
 				}
 				else{
-					retVal.Append("NIL");
+					retVal.Append("\"text\"");
 				}
 
                 // Add contentTypeSubMediaType
@@ -5782,7 +5782,7 @@ namespace LumiSoft.Net.IMAP.Server
                     retVal.Append(" \"" + entity.ContentType.SubType + "\"");
                 }
                 else{
-                    retVal.Append(" NIL");
+                    retVal.Append(" \"plain\"");
                 }
 
 				// conentTypeParameters - Syntax: {("name" SP "value" *(SP "name" SP "value"))}
