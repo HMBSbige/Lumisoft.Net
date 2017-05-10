@@ -639,7 +639,8 @@ namespace LumiSoft.Net.IMAP
             }
             // string/astring/nstring
             else{
-                string word = reader.ReadWord();
+                // Accept cahrs '<' '>' in token.
+                string word = reader.ReadWord(true,new char[]{' ',',',';','{','}','(',')','[',']','\r','\n'},false);
                 
                 // nstring
                 if(string.Equals(word,"NIL",StringComparison.InvariantCultureIgnoreCase)){
