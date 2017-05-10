@@ -274,19 +274,36 @@ namespace LumiSoft.Net.SMTP.Server
                 else if(cmd == "RCPT"){
                     RCPT(args);
                 }
-                else if(cmd == "DATA"){                    
-                    Cmd_DATA cmdData = new Cmd_DATA();
+                else if(cmd == "DATA"){    
+                    Cmd_DATA cmdData = new Cmd_DATA();                    
                     cmdData.CompletedAsync += delegate(object sender,EventArgs<SMTP_Session.Cmd_DATA> e){
-                        if(op.Error != null){
-                            OnError(op.Error);
+                        if(cmdData.Error != null){
+                            if(cmdData.Error is IncompleteDataException){
+                                LogAddText("Disposing SMTP session, remote endpoint closed socket.");
+                            }
+                            else{
+                                LogAddText("Disposing SMTP session, fatal error:" + cmdData.Error.Message);
+                                OnError(cmdData.Error);
+                            }
+                            Dispose();
+                        }
+                        else{
+                            BeginReadCmd();
                         }
 
                         cmdData.Dispose();
-                        BeginReadCmd();
                     };
                     if(!cmdData.Start(this,args)){
-                        if(op.Error != null){
-                            OnError(op.Error);
+                        if(cmdData.Error != null){
+                            if(cmdData.Error is IncompleteDataException){
+                                LogAddText("Disposing SMTP session, remote endpoint closed socket.");
+                            }
+                            else{
+                                LogAddText("Disposing SMTP session, fatal error:" + cmdData.Error.Message);
+                                OnError(cmdData.Error);
+                            }
+                            Dispose();
+                            readNextCommand = false;
                         }
 
                         cmdData.Dispose();
