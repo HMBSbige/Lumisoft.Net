@@ -224,7 +224,7 @@ namespace LumiSoft.Net.POP3.Client
                     
                     // Read POP3 server response.
                     SmartStream.ReadLineAsyncOP op = new SmartStream.ReadLineAsyncOP(new byte[8000],SizeExceededAction.JunkAndThrowException);
-                    op.Completed += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
+                    op.CompletedAsync += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
                         DeleReadResponseCompleted(op);
                     };
                     if(m_pPop3Client.TcpStream.ReadLine(op,true)){
@@ -675,7 +675,7 @@ namespace LumiSoft.Net.POP3.Client
                     
                     // Read POP3 server response.
                     SmartStream.ReadLineAsyncOP op = new SmartStream.ReadLineAsyncOP(new byte[8000],SizeExceededAction.JunkAndThrowException);
-                    op.Completed += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
+                    op.CompletedAsync += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
                         RetrReadResponseCompleted(op);
                     };
                     if(m_pPop3Client.TcpStream.ReadLine(op,true)){
@@ -714,7 +714,7 @@ namespace LumiSoft.Net.POP3.Client
                         // Server returned success response.
                         if(string.Equals(op.LineUtf8.Split(new char[]{' '},2)[0],"+OK",StringComparison.InvariantCultureIgnoreCase)){
                             SmartStream.ReadPeriodTerminatedAsyncOP readMsgOP = new SmartStream.ReadPeriodTerminatedAsyncOP(m_pStream,long.MaxValue,SizeExceededAction.ThrowException);
-                            readMsgOP.Completed += delegate(object sender,EventArgs<SmartStream.ReadPeriodTerminatedAsyncOP> e){
+                            readMsgOP.CompletedAsync += delegate(object sender,EventArgs<SmartStream.ReadPeriodTerminatedAsyncOP> e){
                                 MessageReadingCompleted(readMsgOP);
                             };
                             if(m_pPop3Client.TcpStream.ReadPeriodTerminated(readMsgOP,true)){
@@ -1113,7 +1113,7 @@ namespace LumiSoft.Net.POP3.Client
                     
                     // Read POP3 server response.
                     SmartStream.ReadLineAsyncOP op = new SmartStream.ReadLineAsyncOP(new byte[8000],SizeExceededAction.JunkAndThrowException);
-                    op.Completed += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
+                    op.CompletedAsync += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
                         TopReadResponseCompleted(op);
                     };
                     if(m_pPop3Client.TcpStream.ReadLine(op,true)){
@@ -1152,7 +1152,7 @@ namespace LumiSoft.Net.POP3.Client
                         // Server returned success response.
                         if(string.Equals(op.LineUtf8.Split(new char[]{' '},2)[0],"+OK",StringComparison.InvariantCultureIgnoreCase)){
                             SmartStream.ReadPeriodTerminatedAsyncOP readMsgOP = new SmartStream.ReadPeriodTerminatedAsyncOP(m_pStream,long.MaxValue,SizeExceededAction.ThrowException);
-                            readMsgOP.Completed += delegate(object sender,EventArgs<SmartStream.ReadPeriodTerminatedAsyncOP> e){
+                            readMsgOP.CompletedAsync += delegate(object sender,EventArgs<SmartStream.ReadPeriodTerminatedAsyncOP> e){
                                 MessageReadingCompleted(readMsgOP);
                             };
                             if(m_pPop3Client.TcpStream.ReadPeriodTerminated(readMsgOP,true)){

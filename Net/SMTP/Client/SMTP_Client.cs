@@ -3693,7 +3693,7 @@ namespace LumiSoft.Net.SMTP.Client
 
                 try{
                     SmartStream.ReadLineAsyncOP op = new SmartStream.ReadLineAsyncOP(new byte[8000],SizeExceededAction.JunkAndThrowException);
-                    op.Completed += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){   
+                    op.CompletedAsync += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){   
                         try{
                             // Response reading completed.
                             if(!ReadLineCompleted(op)){

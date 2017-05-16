@@ -200,7 +200,7 @@ namespace LumiSoft.Net.SMTP.Server
             try{
                 SmartStream.ReadLineAsyncOP readLineOP = new SmartStream.ReadLineAsyncOP(new byte[32000],SizeExceededAction.JunkAndThrowException);
                 // This event is raised only if read period-terminated opeartion completes asynchronously.
-                readLineOP.Completed += new EventHandler<EventArgs<SmartStream.ReadLineAsyncOP>>(delegate(object sender,EventArgs<SmartStream.ReadLineAsyncOP> e){                
+                readLineOP.CompletedAsync += new EventHandler<EventArgs<SmartStream.ReadLineAsyncOP>>(delegate(object sender,EventArgs<SmartStream.ReadLineAsyncOP> e){                
                     if(ProcessCmd(readLineOP)){
                         BeginReadCmd();
                     }
@@ -911,7 +911,7 @@ namespace LumiSoft.Net.SMTP.Server
                         SizeExceededAction.JunkAndThrowException
                     );
                     // This event is raised only if read period-terminated opeartion completes asynchronously.
-                    readPeriodTermOP.Completed += new EventHandler<EventArgs<SmartStream.ReadPeriodTerminatedAsyncOP>>(delegate(object sender,EventArgs<SmartStream.ReadPeriodTerminatedAsyncOP> e){                
+                    readPeriodTermOP.CompletedAsync += new EventHandler<EventArgs<SmartStream.ReadPeriodTerminatedAsyncOP>>(delegate(object sender,EventArgs<SmartStream.ReadPeriodTerminatedAsyncOP> e){                
                         MessageReadingCompleted(readPeriodTermOP);
                     });
                     // Read period-terminated completed synchronously.
@@ -1828,7 +1828,7 @@ namespace LumiSoft.Net.SMTP.Server
                 SizeExceededAction.JunkAndThrowException
             );
             // This event is raised only if read period-terminated opeartion completes asynchronously.
-            readPeriodTermOP.Completed += new EventHandler<EventArgs<SmartStream.ReadPeriodTerminatedAsyncOP>>(delegate(object sender,EventArgs<SmartStream.ReadPeriodTerminatedAsyncOP> e){                
+            readPeriodTermOP.CompletedAsync += new EventHandler<EventArgs<SmartStream.ReadPeriodTerminatedAsyncOP>>(delegate(object sender,EventArgs<SmartStream.ReadPeriodTerminatedAsyncOP> e){                
                 DATA_End(startTime,readPeriodTermOP);
             });
             // Read period-terminated completed synchronously.

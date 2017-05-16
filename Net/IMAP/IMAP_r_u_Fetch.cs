@@ -816,7 +816,7 @@ namespace LumiSoft.Net.IMAP
             }
 
             SmartStream.ReadLineAsyncOP readLineOP = new SmartStream.ReadLineAsyncOP(new byte[64000],SizeExceededAction.JunkAndThrowException);
-            readLineOP.Completed += delegate(object sender,EventArgs<SmartStream.ReadLineAsyncOP> e){
+            readLineOP.CompletedAsync += delegate(object sender,EventArgs<SmartStream.ReadLineAsyncOP> e){
                 try{
                     // Read line failed.
                     if(readLineOP.Error != null){

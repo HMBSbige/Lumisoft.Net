@@ -8803,7 +8803,7 @@ namespace LumiSoft.Net.IMAP.Client
                 m_pImapClient = owner;
 
                 m_pReadLineOP = new SmartStream.ReadLineAsyncOP(new byte[m_pImapClient.Settings.ResponseLineSize],SizeExceededAction.JunkAndThrowException);
-                m_pReadLineOP.Completed += new EventHandler<EventArgs<SmartStream.ReadLineAsyncOP>>(m_pReadLineOP_Completed);
+                m_pReadLineOP.CompletedAsync += new EventHandler<EventArgs<SmartStream.ReadLineAsyncOP>>(m_pReadLineOP_Completed);
 
                 SetState(AsyncOP_State.Active);
 

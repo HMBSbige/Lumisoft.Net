@@ -136,7 +136,6 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="AsyncOP.cs" />
     <None Include="Media\Codec\Audio\ILBC.cs" />
     <Compile Include="AsyncOP_State.cs" />
     <Compile Include="AUTH\AUTH_Gmail_OAuth1_3leg.cs" />

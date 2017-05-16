@@ -320,7 +320,7 @@ namespace LumiSoft.Net.POP3.Client
 
                     // Read POP3 server response.
                     SmartStream.ReadLineAsyncOP op = new SmartStream.ReadLineAsyncOP(new byte[8000],SizeExceededAction.JunkAndThrowException);
-                    op.Completed += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
+                    op.CompletedAsync += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
                         CapaReadResponseCompleted(op);
                     };
                     if(m_pPop3Client.TcpStream.ReadLine(op,true)){
@@ -360,7 +360,7 @@ namespace LumiSoft.Net.POP3.Client
                         if(string.Equals(op.LineUtf8.Split(new char[]{' '},2)[0],"+OK",StringComparison.InvariantCultureIgnoreCase)){
                             // Read capa-list.
                             SmartStream.ReadLineAsyncOP readLineOP = new SmartStream.ReadLineAsyncOP(new byte[8000],SizeExceededAction.JunkAndThrowException);
-                            readLineOP.Completed += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
+                            readLineOP.CompletedAsync += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
                                 try{
                                     ReadMultiLineResponseLineCompleted(readLineOP);
 
@@ -722,7 +722,7 @@ namespace LumiSoft.Net.POP3.Client
 
                     // Read POP3 server response.
                     SmartStream.ReadLineAsyncOP op = new SmartStream.ReadLineAsyncOP(new byte[8000],SizeExceededAction.JunkAndThrowException);
-                    op.Completed += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
+                    op.CompletedAsync += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
                         StlsReadResponseCompleted(op);
                     };
                     if(m_pPop3Client.TcpStream.ReadLine(op,true)){
@@ -1109,7 +1109,7 @@ namespace LumiSoft.Net.POP3.Client
 
                     // Read POP3 server response.
                     SmartStream.ReadLineAsyncOP op = new SmartStream.ReadLineAsyncOP(new byte[8000],SizeExceededAction.JunkAndThrowException);
-                    op.Completed += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
+                    op.CompletedAsync += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
                         UserReadResponseCompleted(op);
                     };
                     if(m_pPop3Client.TcpStream.ReadLine(op,true)){
@@ -1186,7 +1186,7 @@ namespace LumiSoft.Net.POP3.Client
 
                     // Read POP3 server response.
                     SmartStream.ReadLineAsyncOP op = new SmartStream.ReadLineAsyncOP(new byte[8000],SizeExceededAction.JunkAndThrowException);
-                    op.Completed += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
+                    op.CompletedAsync += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
                         PassReadResponseCompleted(op);
                     };
                     if(m_pPop3Client.TcpStream.ReadLine(op,true)){
@@ -1575,7 +1575,7 @@ namespace LumiSoft.Net.POP3.Client
 
                     // Read POP3 server response.
                     SmartStream.ReadLineAsyncOP op = new SmartStream.ReadLineAsyncOP(new byte[8000],SizeExceededAction.JunkAndThrowException);
-                    op.Completed += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
+                    op.CompletedAsync += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
                         AuthReadResponseCompleted(op);
                     };
                     if(m_pPop3Client.TcpStream.ReadLine(op,true)){
@@ -1960,7 +1960,7 @@ namespace LumiSoft.Net.POP3.Client
 
                     // Read POP3 server response.
                     SmartStream.ReadLineAsyncOP op = new SmartStream.ReadLineAsyncOP(new byte[8000],SizeExceededAction.JunkAndThrowException);
-                    op.Completed += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
+                    op.CompletedAsync += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
                         NoopReadResponseCompleted(op);
                     };
                     if(m_pPop3Client.TcpStream.ReadLine(op,true)){
@@ -2291,7 +2291,7 @@ namespace LumiSoft.Net.POP3.Client
 
                     // Read POP3 server response.
                     SmartStream.ReadLineAsyncOP op = new SmartStream.ReadLineAsyncOP(new byte[8000],SizeExceededAction.JunkAndThrowException);
-                    op.Completed += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
+                    op.CompletedAsync += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
                         RsetReadResponseCompleted(op);
                     };
                     if(m_pPop3Client.TcpStream.ReadLine(op,true)){
@@ -2916,7 +2916,7 @@ namespace LumiSoft.Net.POP3.Client
 
                     // Read POP3 server response.
                     SmartStream.ReadLineAsyncOP op = new SmartStream.ReadLineAsyncOP(new byte[8000],SizeExceededAction.JunkAndThrowException);
-                    op.Completed += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
+                    op.CompletedAsync += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
                         ListReadResponseCompleted(op);
                     };
                     if(m_pPop3Client.TcpStream.ReadLine(op,true)){
@@ -2956,7 +2956,7 @@ namespace LumiSoft.Net.POP3.Client
                         if(string.Equals(op.LineUtf8.Split(new char[]{' '},2)[0],"+OK",StringComparison.InvariantCultureIgnoreCase)){
                             // Read capa-list.
                             SmartStream.ReadLineAsyncOP readLineOP = new SmartStream.ReadLineAsyncOP(new byte[8000],SizeExceededAction.JunkAndThrowException);
-                            readLineOP.Completed += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
+                            readLineOP.CompletedAsync += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
                                 try{
                                     ReadMultiLineResponseLineCompleted(readLineOP);
 
@@ -3335,7 +3335,7 @@ namespace LumiSoft.Net.POP3.Client
 
                     // Read POP3 server response.
                     SmartStream.ReadLineAsyncOP op = new SmartStream.ReadLineAsyncOP(new byte[8000],SizeExceededAction.JunkAndThrowException);
-                    op.Completed += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
+                    op.CompletedAsync += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
                         UidlReadResponseCompleted(op);
                     };
                     if(m_pPop3Client.TcpStream.ReadLine(op,true)){
@@ -3375,7 +3375,7 @@ namespace LumiSoft.Net.POP3.Client
                         if(string.Equals(op.LineUtf8.Split(new char[]{' '},2)[0],"+OK",StringComparison.InvariantCultureIgnoreCase)){
                             // Read capa-list.
                             SmartStream.ReadLineAsyncOP readLineOP = new SmartStream.ReadLineAsyncOP(new byte[8000],SizeExceededAction.JunkAndThrowException);
-                            readLineOP.Completed += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
+                            readLineOP.CompletedAsync += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
                                 try{
                                     ReadMultiLineResponseLineCompleted(readLineOP);
 
@@ -3577,7 +3577,7 @@ namespace LumiSoft.Net.POP3.Client
         {  
             // Read POP3 server greeting response.
             SmartStream.ReadLineAsyncOP readGreetingOP = new SmartStream.ReadLineAsyncOP(new byte[8000],SizeExceededAction.JunkAndThrowException);
-            readGreetingOP.Completed += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
+            readGreetingOP.CompletedAsync += delegate(object s,EventArgs<SmartStream.ReadLineAsyncOP> e){
                 ReadServerGreetingCompleted(readGreetingOP,callback);
             };
             if(this.TcpStream.ReadLine(readGreetingOP,true)){
