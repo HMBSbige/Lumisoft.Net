@@ -641,7 +641,7 @@ namespace LumiSoft.Net.POP3.Server
                 }
                 // Authentication continues.
                 else{
-                    // Send server challange.
+                    // Send server challenge.
                     if(serverResponse.Length == 0){
                         WriteLine("+ ");
                     }

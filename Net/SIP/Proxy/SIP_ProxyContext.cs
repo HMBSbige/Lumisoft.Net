@@ -312,12 +312,12 @@ namespace LumiSoft.Net.SIP.Proxy
                     // If 401 or 407 (Authentication required), see i we have specified realm(s) credentials, 
                     // if so try to authenticate.
                     if(e.Response.StatusCode == 401 || e.Response.StatusCode == 407){
-                        SIP_t_Challenge[] challanges = null;
+                        SIP_t_Challenge[] challenges = null;
                         if(e.Response.StatusCode == 401){
-                            challanges = e.Response.WWWAuthenticate.GetAllValues();
+                            challenges = e.Response.WWWAuthenticate.GetAllValues();
                         }
                         else{
-                            challanges = e.Response.ProxyAuthenticate.GetAllValues();
+                            challenges = e.Response.ProxyAuthenticate.GetAllValues();
                         }
 
                         // TODO: Porbably we need to auth only if we can provide authentication data to all realms ?
@@ -325,8 +325,8 @@ namespace LumiSoft.Net.SIP.Proxy
                         SIP_Request request = m_pServerTransaction.Request.Copy();
                         request.CSeq.SequenceNumber++;
                         bool hasAny = false;
-                        foreach(SIP_t_Challenge challange in challanges){
-                            Auth_HttpDigest authDigest = new Auth_HttpDigest(challange.AuthData,m_pServerTransaction.Request.Method);
+                        foreach(SIP_t_Challenge challenge in challenges){
+                            Auth_HttpDigest authDigest = new Auth_HttpDigest(challenge.AuthData,m_pServerTransaction.Request.Method);
                             NetworkCredential credential = GetCredential(authDigest.Realm);
                             if(credential != null){
                                 // Don't authenticate again, if we tried already once and failed.

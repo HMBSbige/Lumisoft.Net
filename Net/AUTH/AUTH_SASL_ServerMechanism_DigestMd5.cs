@@ -50,7 +50,7 @@ namespace LumiSoft.Net.AUTH
         /// Continues authentication process.
         /// </summary>
         /// <param name="clientResponse">Client sent SASL response.</param>
-        /// <returns>Retunrns challange response what must be sent to client or null if authentication has completed.</returns>
+        /// <returns>Retunrns challenge response what must be sent to client or null if authentication has completed.</returns>
         /// <exception cref="ArgumentNullException">Is raised when <b>clientResponse</b> is null reference.</exception>
         public override byte[] Continue(byte[] clientResponse)
         {

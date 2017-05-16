@@ -345,23 +345,23 @@ namespace LumiSoft.Net.AUTH
 
         #endregion
 
-        #region method ToChallange
+        #region method ToChallenge
 
         /// <summary>
-        /// Creates 'Challange' data using this class info. 
+        /// Creates 'Challenge' data using this class info. 
         /// </summary>
-        /// <returns>Returns Challange data.</returns>
-        public string ToChallange()
+        /// <returns>Returns Challenge data.</returns>
+        public string ToChallenge()
         {
-            return ToChallange(true);
+            return ToChallenge(true);
         }
 
         /// <summary>
-        /// Creates 'Challange' data using this class info. 
+        /// Creates 'Challenge' data using this class info. 
         /// </summary>
-        /// <param name="addAuthMethod">Specifies if 'digest ' authe method string constant is added.</param>
-        /// <returns>Returns Challange data.</returns>
-        public string ToChallange(bool addAuthMethod)
+        /// <param name="addAuthMethod">Specifies if 'digest ' auth method string constant is added.</param>
+        /// <returns>Returns Challenge data.</returns>
+        public string ToChallenge(bool addAuthMethod)
         {            
             // digest realm="",qop="",nonce="",opaque=""
 
@@ -678,6 +678,47 @@ namespace LumiSoft.Net.AUTH
             set{ m_NonceCount = value; }
         }
                 
+        #endregion
+
+
+        //------- Obsolete 
+
+        #region method ToChallange
+
+        /// <summary>
+        /// Creates 'Challange' data using this class info. 
+        /// </summary>
+        /// <returns>Returns Challange data.</returns>
+        [Obsolete("Mispell error, use ToChallenge method instead.")]
+        public string ToChallange()
+        {
+            return ToChallange(true);
+        }
+
+        /// <summary>
+        /// Creates 'Challange' data using this class info. 
+        /// </summary>
+        /// <param name="addAuthMethod">Specifies if 'digest ' auth method string constant is added.</param>
+        /// <returns>Returns Challange data.</returns>
+        [Obsolete("Mispell error, use ToChallenge method instead.")]
+        public string ToChallange(bool addAuthMethod)
+        {            
+            // digest realm="",qop="",nonce="",opaque=""
+
+            StringBuilder retVal = new StringBuilder();
+            if(addAuthMethod){
+                retVal.Append("digest ");
+            }
+            retVal.Append("realm=" + TextUtils.QuoteString(m_Realm) + ",");
+            if(!string.IsNullOrEmpty(m_Qop)){
+                retVal.Append("qop=" + TextUtils.QuoteString(m_Qop) + ",");
+            }
+            retVal.Append("nonce=" + TextUtils.QuoteString(m_Nonce) + ",");
+            retVal.Append("opaque=" + TextUtils.QuoteString(m_Opaque));
+
+            return retVal.ToString();
+        }
+
         #endregion
 
     }

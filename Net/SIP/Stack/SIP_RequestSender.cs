@@ -119,17 +119,17 @@ namespace LumiSoft.Net.SIP.Stack
                     // Check if authentication failed(We sent authorization data and it's challenged again, 
                     // probably user name or password inccorect)
                     bool hasFailedAuthorization = false;
-                    foreach(SIP_t_Challenge challange in e.Response.WWWAuthenticate.GetAllValues()){
+                    foreach(SIP_t_Challenge challenge in e.Response.WWWAuthenticate.GetAllValues()){
                         foreach(SIP_t_Credentials credentials in m_pTransaction.Request.Authorization.GetAllValues()){
-                            if(new Auth_HttpDigest(challange.AuthData,"").Realm == new Auth_HttpDigest(credentials.AuthData,"").Realm){
+                            if(new Auth_HttpDigest(challenge.AuthData,"").Realm == new Auth_HttpDigest(credentials.AuthData,"").Realm){
                                 hasFailedAuthorization = true;
                                 break;
                             }
                         }
                     }
-                    foreach(SIP_t_Challenge challange in e.Response.ProxyAuthenticate.GetAllValues()){
+                    foreach(SIP_t_Challenge challenge in e.Response.ProxyAuthenticate.GetAllValues()){
                         foreach(SIP_t_Credentials credentials in m_pTransaction.Request.ProxyAuthorization.GetAllValues()){
-                            if(new Auth_HttpDigest(challange.AuthData,"").Realm == new Auth_HttpDigest(credentials.AuthData,"").Realm){
+                            if(new Auth_HttpDigest(challenge.AuthData,"").Realm == new Auth_HttpDigest(credentials.AuthData,"").Realm){
                                 hasFailedAuthorization = true;
                                 break;
                             }
@@ -140,7 +140,7 @@ namespace LumiSoft.Net.SIP.Stack
                     if(hasFailedAuthorization){
                         OnResponseReceived(e.Response);
                     }
-                    // Try to authorize challanges.
+                    // Try to authorize challenges.
                     else{
                         SIP_Request request = m_pRequest.Copy();
 
@@ -152,7 +152,7 @@ namespace LumiSoft.Net.SIP.Stack
                         */
                         request.CSeq = new SIP_t_CSeq(m_pStack.ConsumeCSeq(),request.CSeq.RequestMethod);
 
-                        // All challanges authorized, resend request.
+                        // All challenges authorized, resend request.
                         if(Authorize(request,e.Response,this.Credentials.ToArray())){
                             SIP_Flow flow  = m_pTransaction.Flow;
                             CleanUpActiveTransaction();            
@@ -403,12 +403,12 @@ namespace LumiSoft.Net.SIP.Stack
         #region method Authorize
 
         /// <summary>
-        /// Creates authorization for each challange in <b>response</b>.
+        /// Creates authorization for each challenge in <b>response</b>.
         /// </summary>
         /// <param name="request">SIP request where to add authorization values.</param>
-        /// <param name="response">SIP response which challanges to authorize.</param>
+        /// <param name="response">SIP response which challenges to authorize.</param>
         /// <param name="credentials">Credentials for authorization.</param>
-        /// <returns>Returns true if all challanges were authorized. If any of the challanges was not authorized, returns false.</returns>
+        /// <returns>Returns true if all challenges were authorized. If any of the challanges was not authorized, returns false.</returns>
         private bool Authorize(SIP_Request request,SIP_Response response,NetworkCredential[] credentials)
         {
             if(request == null){
@@ -425,10 +425,10 @@ namespace LumiSoft.Net.SIP.Stack
 
             #region WWWAuthenticate
 
-            foreach(SIP_t_Challenge challange in response.WWWAuthenticate.GetAllValues()){
-                Auth_HttpDigest authDigest = new Auth_HttpDigest(challange.AuthData,request.RequestLine.Method);
+            foreach(SIP_t_Challenge challenge in response.WWWAuthenticate.GetAllValues()){
+                Auth_HttpDigest authDigest = new Auth_HttpDigest(challenge.AuthData,request.RequestLine.Method);
 
-                // Serach credential for the specified challange.
+                // Serach credential for the specified challenge.
                 NetworkCredential credential = null;
                 foreach(NetworkCredential c in credentials){
                     if(string.Equals(c.Domain,authDigest.Realm,StringComparison.InvariantCultureIgnoreCase)){
@@ -436,11 +436,11 @@ namespace LumiSoft.Net.SIP.Stack
                         break;
                     }
                 }
-                // We don't have credential for this challange.
+                // We don't have credential for this challenge.
                 if(credential == null){
                     allAuthorized = false;
                 }
-                // Authorize challange.
+                // Authorize challenge.
                 else{
                     authDigest.UserName = credential.UserName;
                     authDigest.Password = credential.Password;
@@ -455,10 +455,10 @@ namespace LumiSoft.Net.SIP.Stack
 
             #region ProxyAuthenticate
 
-            foreach(SIP_t_Challenge challange in response.ProxyAuthenticate.GetAllValues()){
-                Auth_HttpDigest authDigest = new Auth_HttpDigest(challange.AuthData,request.RequestLine.Method);
+            foreach(SIP_t_Challenge challenge in response.ProxyAuthenticate.GetAllValues()){
+                Auth_HttpDigest authDigest = new Auth_HttpDigest(challenge.AuthData,request.RequestLine.Method);
 
-                // Serach credential for the specified challange.
+                // Serach credential for the specified challenge.
                 NetworkCredential credential = null;
                 foreach(NetworkCredential c in credentials){
                     if(string.Equals(c.Domain,authDigest.Realm,StringComparison.InvariantCultureIgnoreCase)){
@@ -466,11 +466,11 @@ namespace LumiSoft.Net.SIP.Stack
                         break;
                     }
                 }
-                // We don't have credential for this challange.
+                // We don't have credential for this challenge.
                 if(credential == null){
                     allAuthorized = false;
                 }
-                // Authorize challange.
+                // Authorize challenge.
                 else{
                     authDigest.UserName = credential.UserName;
                     authDigest.Password = credential.Password;

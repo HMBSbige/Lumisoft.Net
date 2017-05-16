@@ -23,7 +23,7 @@ namespace LumiSoft.Net.AUTH
         /// Continues authentication process.
         /// </summary>
         /// <param name="serverResponse">Server sent SASL response.</param>
-        /// <returns>Returns challange request what must be sent to server or null if authentication has completed.</returns>
+        /// <returns>Returns challenge request what must be sent to server or null if authentication has completed.</returns>
         /// <exception cref="ArgumentNullException">Is raised when <b>serverResponse</b> is null reference.</exception>
         public abstract byte[] Continue(byte[] serverResponse);
 

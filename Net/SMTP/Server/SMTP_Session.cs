@@ -1360,7 +1360,7 @@ namespace LumiSoft.Net.SMTP.Server
                 }
                 // Authentication continues.
                 else{
-                    // Send server challange.
+                    // Send server challenge.
                     if(serverResponse.Length == 0){
                         WriteLine("334 ");
                     }

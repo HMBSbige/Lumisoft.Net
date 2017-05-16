@@ -824,7 +824,7 @@ namespace LumiSoft.Net.SIP.Proxy
             // No credentials for our realm.
             if(credentials == null){
                 SIP_Response notAuthenticatedResponse = m_pStack.CreateResponse(SIP_ResponseCodes.x407_Proxy_Authentication_Required,e.Request);
-                notAuthenticatedResponse.ProxyAuthenticate.Add(new Auth_HttpDigest(m_pStack.Realm,m_pStack.DigestNonceManager.CreateNonce(),m_Opaque).ToChallange());
+                notAuthenticatedResponse.ProxyAuthenticate.Add(new Auth_HttpDigest(m_pStack.Realm,m_pStack.DigestNonceManager.CreateNonce(),m_Opaque).ToChallenge());
                     
                 e.ServerTransaction.SendResponse(notAuthenticatedResponse);
                 return false;
@@ -834,7 +834,7 @@ namespace LumiSoft.Net.SIP.Proxy
             // Check opaque validity.
             if(auth.Opaque != m_Opaque){
                 SIP_Response notAuthenticatedResponse = m_pStack.CreateResponse(SIP_ResponseCodes.x407_Proxy_Authentication_Required + ": Opaque value won't match !",e.Request);
-                notAuthenticatedResponse.ProxyAuthenticate.Add(new Auth_HttpDigest(m_pStack.Realm,m_pStack.DigestNonceManager.CreateNonce(),m_Opaque).ToChallange());
+                notAuthenticatedResponse.ProxyAuthenticate.Add(new Auth_HttpDigest(m_pStack.Realm,m_pStack.DigestNonceManager.CreateNonce(),m_Opaque).ToChallenge());
 
                 // Send response
                 e.ServerTransaction.SendResponse(notAuthenticatedResponse);
@@ -843,7 +843,7 @@ namespace LumiSoft.Net.SIP.Proxy
             // Check nonce validity.
             if(!m_pStack.DigestNonceManager.NonceExists(auth.Nonce)){
                 SIP_Response notAuthenticatedResponse = m_pStack.CreateResponse(SIP_ResponseCodes.x407_Proxy_Authentication_Required + ": Invalid nonce value !",e.Request);
-                notAuthenticatedResponse.ProxyAuthenticate.Add(new Auth_HttpDigest(m_pStack.Realm,m_pStack.DigestNonceManager.CreateNonce(),m_Opaque).ToChallange());
+                notAuthenticatedResponse.ProxyAuthenticate.Add(new Auth_HttpDigest(m_pStack.Realm,m_pStack.DigestNonceManager.CreateNonce(),m_Opaque).ToChallenge());
 
                 // Send response
                 e.ServerTransaction.SendResponse(notAuthenticatedResponse);
@@ -858,7 +858,7 @@ namespace LumiSoft.Net.SIP.Proxy
             // Authenticate failed.
             if(!eArgs.Authenticated){
                 SIP_Response notAuthenticatedResponse = m_pStack.CreateResponse(SIP_ResponseCodes.x407_Proxy_Authentication_Required + ": Authentication failed.",e.Request);
-                notAuthenticatedResponse.ProxyAuthenticate.Add(new Auth_HttpDigest(m_pStack.Realm,m_pStack.DigestNonceManager.CreateNonce(),m_Opaque).ToChallange());
+                notAuthenticatedResponse.ProxyAuthenticate.Add(new Auth_HttpDigest(m_pStack.Realm,m_pStack.DigestNonceManager.CreateNonce(),m_Opaque).ToChallenge());
                     
                 // Send response
                 e.ServerTransaction.SendResponse(notAuthenticatedResponse);

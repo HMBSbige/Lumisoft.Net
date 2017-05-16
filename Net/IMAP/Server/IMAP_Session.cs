@@ -1441,7 +1441,7 @@ namespace LumiSoft.Net.IMAP.Server
                 }
                 // Authentication continues.
                 else{
-                    // Send server challange.
+                    // Send server challenge.
                     if(serverResponse.Length == 0){
                         m_pResponseSender.SendResponseAsync(new IMAP_r_ServerStatus("+",""));
                     }

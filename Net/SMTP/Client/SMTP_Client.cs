@@ -4617,7 +4617,7 @@ namespace LumiSoft.Net.SMTP.Client
                 /*
                     Example:
 					    C: AUTH DIGEST-MD5<CRLF>
-					    S: 334 base64(digestChallange)<CRLF>
+					    S: 334 base64(digestChallenge)<CRLF>
 					    C: base64(digestResponse)<CRLF>
                         S: 334 base64(serverDigestRpAuth)<CRLF>
                         C: <CRLF>
