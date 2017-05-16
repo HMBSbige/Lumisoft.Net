@@ -1292,18 +1292,19 @@ namespace LumiSoft.Net
         /// </summary>
         /// <param name="text">Text to hash.</param>
         /// <param name="hex">Specifies if md5 value is returned as hex string.</param>
-        /// <returns>Resturns md5 value or md5 hex value.</returns>              
+        /// <returns>Returns md5 value or md5 hex value.</returns>              
         [Obsolete("Use Net_Utils.ComputeMd5 instead of it")]
         public static string ComputeMd5(string text,bool hex)
         {
-            System.Security.Cryptography.MD5 md5 = new System.Security.Cryptography.MD5CryptoServiceProvider();			
-			byte[] hash = md5.ComputeHash(Encoding.Default.GetBytes(text));
+            using(System.Security.Cryptography.MD5 md5 = new System.Security.Cryptography.MD5CryptoServiceProvider()){
+                byte[] hash = md5.ComputeHash(Encoding.Default.GetBytes(text));
 
-            if(hex){
-			    return ToHexString(System.Text.Encoding.Default.GetString(hash)).ToLower();
-            }
-            else{
-                return System.Text.Encoding.Default.GetString(hash);
+                if(hex){
+			        return ToHexString(System.Text.Encoding.Default.GetString(hash)).ToLower();
+                }
+                else{
+                    return System.Text.Encoding.Default.GetString(hash);
+                }
             }
         }
 

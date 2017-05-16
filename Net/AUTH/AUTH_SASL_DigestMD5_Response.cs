@@ -536,9 +536,10 @@ namespace LumiSoft.Net.AUTH
         /// <returns>Return MD5 hash.</returns>
         private byte[] h(byte[] value)
         {
-            System.Security.Cryptography.MD5 md5 = new System.Security.Cryptography.MD5CryptoServiceProvider();			
-			
-            return md5.ComputeHash(value);
+            using(System.Security.Cryptography.MD5 md5 = new System.Security.Cryptography.MD5CryptoServiceProvider()){
+
+                return md5.ComputeHash(value);
+            }
         }
 
         #endregion
