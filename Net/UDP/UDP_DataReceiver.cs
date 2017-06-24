@@ -19,7 +19,7 @@ namespace LumiSoft.Net.UDP
         private bool                 m_IsRunning   = false;
         private Socket               m_pSocket     = null;
         private byte[]               m_pBuffer     = null;
-        private int                  m_BufferSize  = 1400;
+        private int                  m_BufferSize  = 8000;
         private SocketAsyncEventArgs m_pSocketArgs = null;
         private UDP_e_PacketReceived m_pEventArgs  = null;
 
