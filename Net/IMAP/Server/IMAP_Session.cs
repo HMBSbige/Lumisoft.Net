@@ -5880,7 +5880,7 @@ namespace LumiSoft.Net.IMAP.Server
 
                     // body disposition  Syntax: {(disposition-type [ SP ("name" SP "value" *(SP "name" SP "value"))])}
 				    if(entity.ContentDisposition != null && entity.ContentDisposition.Parameters.Count > 0){
-                        retVal.Append(" (" + entity.ContentDisposition.DispositionType);
+                        retVal.Append(" (\"" + entity.ContentDisposition.DispositionType + "\"");
 
                         if(entity.ContentDisposition.Parameters.Count > 0){
                             retVal.Append(" (");
