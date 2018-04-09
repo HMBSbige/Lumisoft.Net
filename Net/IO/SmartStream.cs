@@ -2000,12 +2000,15 @@ namespace LumiSoft.Net.IO
                     return;
                 }
 
+                // Note: Get riseCompleted in lock, otherwise we get race condition Start method m_RiseCompleted = true.
+                bool riseCompleted = m_RiseCompleted;
                 lock(m_pLock){
                     m_State = state;
+                    riseCompleted = m_RiseCompleted;
+                }
 
-                    if(m_State == AsyncOP_State.Completed && m_RiseCompleted){
-                        OnCompletedAsync();
-                    }
+                if(m_State == AsyncOP_State.Completed && riseCompleted){
+                    OnCompletedAsync();
                 }
             }
 
@@ -2020,18 +2023,33 @@ namespace LumiSoft.Net.IO
             {                
                 try{
                     while(true){
+                        bool isBeginReadCompleted = false;
+                        bool isCompletedSync      = false;
                         int count = m_Count == -1 ? m_pBuffer.Length : (int)Math.Min(m_pBuffer.Length,m_Count - m_BytesWritten);
                         IAsyncResult readResult = m_pStream.BeginRead(
                             m_pBuffer,
                             0,
                             count,
                             delegate(IAsyncResult r){
+                                lock(m_pLock){
+                                    // BeginRead completed synchronously.
+                                    if(!isBeginReadCompleted){
+                                        isCompletedSync = true;
+                                        return;
+                                    }
+                                }
+
                                 ProcessReadDataResult(r);
                             },
                             null
                         );
+
+                        lock(m_pLock){
+                            isBeginReadCompleted = true;
+                        }
+
                         // Read data completed synchonously.
-                        if(readResult.CompletedSynchronously){
+                        if(isCompletedSync){
                             // Operation completed asynchronously, it will continue processing.
                             if(ProcessReadDataResult(readResult)){
                                 break;
@@ -2078,11 +2096,21 @@ namespace LumiSoft.Net.IO
                         }
                     }
                     else{
+                        bool isBeginWriteCompleted = false;
+                        bool isCompletedSync       = false;
                         IAsyncResult writeResult = m_pOwner.BeginWrite(
                             m_pBuffer,
                             0,
                             countReaded,
                             delegate(IAsyncResult r){
+                                lock(m_pLock){
+                                    // BeginWrite completed synchronously.
+                                    if(!isBeginWriteCompleted){
+                                        isCompletedSync = true;
+                                        return;
+                                    }
+                                }
+
                                 try{
                                     m_pOwner.EndWrite(r);
                                     m_BytesWritten += countReaded;
@@ -2103,7 +2131,13 @@ namespace LumiSoft.Net.IO
                             },
                             null
                         );
-                        if(writeResult.CompletedSynchronously){
+
+                        lock(m_pLock){
+                            isBeginWriteCompleted = true;
+                        }
+
+                        // BeginWrite completed synchronously.
+                        if(isCompletedSync){
                             m_pOwner.EndWrite(writeResult);
                             m_BytesWritten += countReaded;
 
@@ -2922,20 +2956,27 @@ namespace LumiSoft.Net.IO
 
             if(async){
                 m_pReadBufferOP.ReleaseEvents();
-                m_pReadBufferOP.CompletedAsync += new EventHandler<EventArgs<BufferReadAsyncOP>>(delegate(object s,EventArgs<BufferReadAsyncOP> e){            
-                    if(e.Value.Error != null){
-                        if(asyncCallback != null){
-                            asyncCallback(e.Value.Error);
+                m_pReadBufferOP.CompletedAsync += new EventHandler<EventArgs<BufferReadAsyncOP>>(delegate(object s,EventArgs<BufferReadAsyncOP> e){
+                    try{            
+                        if(e.Value.Error != null){
+                            if(asyncCallback != null){
+                                asyncCallback(e.Value.Error);
+                            }
+                        }
+                        else{
+                            m_ReadBufferOffset =  0;
+                            m_ReadBufferCount  =  e.Value.BytesInBuffer;
+                            m_BytesReaded      += e.Value.BytesInBuffer;
+                            m_LastActivity     =  DateTime.Now; 
+
+                            if(asyncCallback != null){
+                                asyncCallback(null);
+                            }
                         }
                     }
-                    else{
-                        m_ReadBufferOffset =  0;
-                        m_ReadBufferCount  =  e.Value.BytesInBuffer;
-                        m_BytesReaded      += e.Value.BytesInBuffer;
-                        m_LastActivity     =  DateTime.Now; 
-
+                    catch(Exception x){
                         if(asyncCallback != null){
-                            asyncCallback(null);
+                            asyncCallback(x);
                         }
                     }
                 });
