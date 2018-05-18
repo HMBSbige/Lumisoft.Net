@@ -1071,6 +1071,8 @@ namespace LumiSoft.Net.FTP.Server
 			*/
 
             m_RenameFrom = argsText;
+
+            WriteLine("350 OK, waiting for RNTO command.");
 		}
 
 		#endregion
