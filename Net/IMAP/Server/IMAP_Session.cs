@@ -1435,7 +1435,7 @@ namespace LumiSoft.Net.IMAP.Server
                         m_pResponseSender.SendResponseAsync(new IMAP_r_ServerStatus(cmdTag,"OK","Authentication succeeded."));
                     }
                     else{
-                        m_pResponseSender.SendResponseAsync(new IMAP_r_ServerStatus(cmdTag,"OK","Authentication credentials invalid."));
+                        m_pResponseSender.SendResponseAsync(new IMAP_r_ServerStatus(cmdTag,"NO","Authentication credentials invalid."));
                     }
                     break;
                 }
