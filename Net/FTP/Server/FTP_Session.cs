@@ -451,7 +451,10 @@ namespace LumiSoft.Net.FTP.Server
                     }
                 }
 
-                if(cmd == "USER"){
+                if(cmd == "AUTH"){
+                    USER(args);
+                }
+                else if(cmd == "USER"){
                     USER(args);
                 }
                 else if(cmd == "PASS"){
@@ -553,6 +556,45 @@ namespace LumiSoft.Net.FTP.Server
 
         #endregion
 
+        #region method AUTH
+
+        private void AUTH(string argsText)
+        {
+            // RFC 4217
+
+            if(m_SessionRejected){
+                WriteLine("500 Bad sequence of commands: Session rejected.");
+
+                return;
+            }
+            if(this.Certificate == null){
+                WriteLine("500 TLS not available: Server has no SSL certificate.");
+
+                return;
+            }
+
+            if(string.Equals("TLS",argsText)){
+                WriteLine("234 Ready to start TLS.");
+
+                try{
+                    SwitchToSecure();
+
+                    // Log
+                    LogAddText("TLS negotiation completed successfully.");
+                }
+                catch(Exception x){
+                    // Log
+                    LogAddText("TLS negotiation failed: " + x.Message + ".");
+
+                    Disconnect();
+                }
+            }
+            else{ 
+                WriteLine("500 Error in arguments.");
+            }
+        }
+
+        #endregion
 
 		#region method USER
 
@@ -1460,7 +1502,7 @@ namespace LumiSoft.Net.FTP.Server
                 // Find free port.
                 for(int i=port;i<IPEndPoint.MaxPort;i++){
                     try{
-                        m_pPassiveSocket.Bind(new IPEndPoint(IPAddress.Any,port));
+                        m_pPassiveSocket.Bind(new IPEndPoint(IPAddress.Any,i));
 
 					    // If we reach here then port is free
 					    break;
@@ -1646,6 +1688,9 @@ namespace LumiSoft.Net.FTP.Server
 
             StringBuilder retVal = new StringBuilder();
             retVal.Append("211-Extensions supported:\r\n");
+            if(!this.IsSecureConnection && this.Certificate != null){
+                retVal.Append(" TLS\r\n");
+            }
             retVal.Append(" SIZE\r\n");
             retVal.Append("211 End of extentions.\r\n");
 

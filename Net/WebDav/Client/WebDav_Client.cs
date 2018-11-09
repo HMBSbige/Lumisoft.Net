@@ -201,6 +201,7 @@ namespace LumiSoft.Net.WebDav.Client
             request.Credentials = m_pCredentials;
             request.PreAuthenticate = true;
             request.AllowWriteStreamBuffering = false;
+            request.Timeout = System.Threading.Timeout.Infinite;
             if(stream.CanSeek){                
                 request.ContentLength = (stream.Length - stream.Position);
             }            
