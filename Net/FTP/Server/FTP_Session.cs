@@ -452,7 +452,7 @@ namespace LumiSoft.Net.FTP.Server
                 }
 
                 if(cmd == "AUTH"){
-                    USER(args);
+                    AUTH(args);
                 }
                 else if(cmd == "USER"){
                     USER(args);
@@ -1503,15 +1503,14 @@ namespace LumiSoft.Net.FTP.Server
                 for(int i=port;i<IPEndPoint.MaxPort;i++){
                     try{
                         m_pPassiveSocket.Bind(new IPEndPoint(IPAddress.Any,i));
+                        m_pPassiveSocket.Listen(1);
 
 					    // If we reach here then port is free
 					    break;
 				    }
 				    catch{
 				    }
-                }
-
-                m_pPassiveSocket.Listen(1);
+                }                
             }
 
 			// Notify client on what IP and port server is listening client to connect.

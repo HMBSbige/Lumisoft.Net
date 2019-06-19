@@ -188,6 +188,7 @@ namespace LumiSoft.Net.WebDav.Client
                 HttpWebRequest dummy  = (HttpWebRequest)HttpWebRequest.Create(targetUri);
 			    // Set the username and the password.
 			    dummy.Credentials = m_pCredentials;
+                dummy.UnsafeAuthenticatedConnectionSharing = true;
 			    dummy.PreAuthenticate = true;
 			    dummy.Method = "HEAD";
 			    ((HttpWebResponse)dummy.GetResponse()).Close(); 
@@ -199,6 +200,7 @@ namespace LumiSoft.Net.WebDav.Client
             request.Method = "PUT";
             request.ContentType = "application/octet-stream";
             request.Credentials = m_pCredentials;
+            request.UnsafeAuthenticatedConnectionSharing = true;
             request.PreAuthenticate = true;
             request.AllowWriteStreamBuffering = false;
             request.Timeout = System.Threading.Timeout.Infinite;
@@ -210,7 +212,7 @@ namespace LumiSoft.Net.WebDav.Client
                 Net_Utils.StreamCopy(stream,requestStream,32000);
             }
 
-            request.GetResponse();
+            ((HttpWebResponse)request.GetResponse()).Close(); 
         }
 
         #endregion
